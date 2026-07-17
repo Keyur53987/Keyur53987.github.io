@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskIQ — AI Project Manager — Keyurkumar Panchal</title>
+<meta name="description" content="TaskIQ converts unstructured meeting notes into structured, prioritized tasks using a chain-of-thought Gemini pipeline with schema-constrained JSON extraction and a live Kanban board.">
+<meta name="theme-color" content="#fbfafc">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%237c3aed'/%3E%3Ctext x='50' y='68' font-family='monospace' font-size='52' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+
+<a href="#top" class="skip-link">Skip to content</a>
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<header class="nav" id="nav">
+  <a href="../index.html" class="nav-mark">kp<span>/</span></a>
+  <nav class="nav-links" id="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#skills">Skills</a>
+    <a href="../index.html#experience">Experience</a>
+    <a href="index.html">Projects</a>
+    <a href="../index.html#contact">Contact</a>
+  </nav>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<main id="top">
+
+<p class="crumb">
+  <a href="../index.html">kp/</a><span class="sep">/</span>
+  <a href="index.html">projects</a><span class="sep">/</span>
+  <span class="current">TaskIQ</span>
+</p>
+
+<!-- ============ HERO ============ -->
+<section class="case-hero">
+  <p class="case-eyebrow">~/projects/TaskIQ · README.md</p>
+  <h1 class="case-title">TaskIQ — AI Project Manager</h1>
+  <p class="case-thesis">Turns unstructured meeting notes and chat logs into structured, prioritized tasks — a chain-of-thought Gemini pipeline with schema-constrained JSON extraction, a persistence layer, and a live drag-and-drop Kanban board on top.</p>
+
+  <div class="case-links">
+    <a class="btn btn-primary" href="https://github.com/Keyur53987/TaskIQ" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+    <a class="btn btn-ghost" href="https://taskiq-9j8s.onrender.com" target="_blank" rel="noopener noreferrer">Live Demo</a>
+    <a class="btn btn-ghost" href="#example">Jump to Worked Example</a>
+  </div>
+
+  <div class="stat-grid reveal">
+    <div class="stat-cell">
+      <span class="num">6</span>
+      <span class="lbl">REST API Endpoints</span>
+    </div>
+    <div class="stat-cell">
+      <span class="num">3×</span>
+      <span class="lbl">Exponential Backoff Retries</span>
+    </div>
+    <div class="stat-cell">
+      <span class="num">5</span>
+      <span class="lbl">pytest Test Functions</span>
+    </div>
+    <div class="stat-cell">
+      <span class="num">200w</span>
+      <span class="lbl">Max AI Summary Length</span>
+    </div>
+  </div>
+</section>
+
+<nav class="case-toc" aria-label="Section contents">
+  <span class="lbl">Contents</span>
+  <a href="#overview">Overview</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#methodology">How It Works</a>
+  <a href="#example">Worked Example</a>
+  <a href="#results">Kanban &amp; Reliability</a>
+  <a href="#stack">Tech Stack</a>
+</nav>
+
+<!-- ============ OVERVIEW ============ -->
+<section class="section" id="overview">
+  <div class="section-head reveal">
+    <p class="section-path">01 · overview</p>
+    <h2>The problem</h2>
+  </div>
+  <div class="prose reveal">
+    <p>Meeting notes and chat logs are full of tasks that never make it onto anyone's board — buried in a sentence, missing an owner, with a deadline stated as "by EOD" instead of a date. Someone has to read the whole thing and manually translate it into tickets. TaskIQ does that translation step: paste in raw, messy text and get back structured tasks — description, owner, due date, priority — ready to drop onto a Kanban board.</p>
+    <p>The core design problem is <strong>reliability of extraction</strong>. A plain "summarize this into tasks" prompt tends to invent fields, skip implicit deadlines, or return inconsistent JSON shapes between calls. TaskIQ constrains the model with a <strong>Pydantic response schema</strong> and forces it to reason before it extracts, rather than trusting free-form output.</p>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section class="section" id="architecture">
+  <div class="section-head reveal">
+    <p class="section-path">02 · architecture</p>
+    <h2>System architecture</h2>
+    <p class="section-sub">A vanilla JS/HTML/CSS frontend talking to a small FastAPI service, backed by SQLite and Google's Gemini API.</p>
+  </div>
+
+  <div class="diagram-card reveal">
+    <span class="diagram-label">Extraction flow</span>
+    <div class="pipeline">
+      <div class="pipeline-box on"><span class="t">Raw Notes</span><span class="d">Pasted meeting text<br>or chat log</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box"><span class="t">POST /api/tasks/extract</span><span class="d">FastAPI route</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box on"><span class="t">Gemini 2.5 Flash</span><span class="d">CoT reasoning +<br>schema-locked JSON</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box"><span class="t">Parsed Tasks</span><span class="d">description, owner,<br>due date, priority</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box"><span class="t">SQLite</span><span class="d">tasks.db</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box on"><span class="t">Kanban UI</span><span class="d">Drag-and-drop<br>status columns</span></div>
+    </div>
+
+    <div class="branch-grid">
+      <div class="branch-card">
+        <div class="bc-head">🧠 chain-of-thought first</div>
+        <p>The schema's first field is <code>reasoning</code>, not the task itself — the model has to write out its inference about priority and ownership before it's allowed to produce the structured fields.</p>
+      </div>
+      <div class="branch-card">
+        <div class="bc-head">↺ resilient by default</div>
+        <p>Every LLM call is wrapped in Tenacity's <code>retry</code> with exponential backoff (up to 3 attempts), so a transient API hiccup doesn't surface as a failed extraction.</p>
+      </div>
+      <div class="branch-card">
+        <div class="bc-head">📝 executive summary</div>
+        <p>A second, independent flow reads every task row back out of SQLite and asks Gemini for a stakeholder-ready status summary — on-track / at-risk / behind, highlights, blockers, next steps.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section" id="methodology">
+  <div class="section-head reveal">
+    <p class="section-path">03 · how it works</p>
+    <h2>How extraction works</h2>
+  </div>
+
+  <div class="step-list reveal">
+    <div class="step-item">
+      <span class="step-num">01</span>
+      <div>
+        <h4>Schema-constrained output, not free-form JSON</h4>
+        <p>Extraction targets a Pydantic model — <code>reasoning</code>, <code>description</code>, <code>due_date</code>, <code>owner</code>, <code>priority</code> — passed to the Gemini API as a native <code>response_schema</code> with <code>response_mime_type: application/json</code>. The model literally cannot return a shape other than the one TaskIQ expects; there's no regex-and-hope JSON parsing on the way back.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <span class="step-num">02</span>
+      <div>
+        <h4>Reasoning before extraction</h4>
+        <p><code>reasoning</code> is deliberately the first field in the schema. Because Gemini's structured output is generated field-by-field in order, putting reasoning first forces the model to think through who owns the task and how urgent it is <em>before</em> it commits to the <code>priority</code> and <code>owner</code> values — a lightweight chain-of-thought trick that costs one extra field and meaningfully improves consistency.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <span class="step-num">03</span>
+      <div>
+        <h4>A one-shot example baked into the prompt</h4>
+        <p>The system prompt includes one worked example directly, anchoring the model's sense of "correct" before it ever sees real input — the same example shown in the walkthrough below. At <code>temperature = 0.1</code>, generation stays close to that anchor rather than drifting stylistically between calls.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <span class="step-num">04</span>
+      <div>
+        <h4>Resilience via exponential backoff</h4>
+        <p>Both the extraction call and the summary call are wrapped in Tenacity's <code>@retry</code> decorator: up to 3 attempts, exponential wait starting at 2 seconds and capping at 10. A transient rate limit or network blip retries silently instead of surfacing as a broken request.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <span class="step-num">05</span>
+      <div>
+        <h4>Persistence &amp; the AI summary</h4>
+        <p>Extracted tasks land in a SQLite <code>tasks</code> table (<code>id</code>, <code>description</code>, <code>due_date</code>, <code>owner</code>, <code>priority</code>, <code>status</code>). A separate <code>/api/tasks/summary</code> endpoint re-reads the full task list and asks Gemini — at a looser <code>temperature = 0.3</code>, since this call is prose rather than structured data — for a markdown status report capped at 200 words: overall status, key highlights, blockers, and next steps.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WORKED EXAMPLE ============ -->
+<section class="section" id="example">
+  <div class="section-head reveal">
+    <p class="section-path">04 · worked example</p>
+    <h2>The example baked into the prompt</h2>
+    <p class="section-sub">This exact input/output pair is embedded in <code>llm.py</code> as the model's one-shot anchor — reproduced here verbatim from the source.</p>
+  </div>
+
+  <div class="example-card reveal">
+    <div class="example-io">
+      <div>
+        <span class="io-label">Raw input text</span>
+        <p class="io-text">"We need to fix the login bug immediately, it's crashing production. Sarah, please handle this by EOD."</p>
+      </div>
+      <div>
+        <span class="io-label">Endpoint</span>
+        <p class="io-text"><code>POST /api/tasks/extract</code></p>
+      </div>
+    </div>
+    <div class="code-block" style="border:none; border-top:1px solid var(--line-soft);">
+      <div class="cb-head"><span>extracted_task.json</span><span>Gemini 2.5 Flash</span></div>
+      <pre>{
+  <span class="tok-str">"reasoning"</span>: <span class="tok-str">"The login bug is crashing production, which indicates
+    critical urgency. Sarah is explicitly assigned. Deadline is EOD."</span>,
+  <span class="tok-str">"description"</span>: <span class="tok-str">"Fix production crash caused by login bug"</span>,
+  <span class="tok-str">"due_date"</span>: <span class="tok-str">"Today"</span>,
+  <span class="tok-str">"owner"</span>: <span class="tok-str">"Sarah"</span>,
+  <span class="tok-str">"priority"</span>: <span class="tok-str">"High"</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="prose mt-lg reveal">
+    <p>Notice the order: <code>reasoning</code> is written first and does the actual work — it names the urgency signal, the assignee, and the deadline before those become structured fields. <code>priority: "High"</code> isn't a keyword match on "immediately"; it's downstream of the model already having reasoned that a production outage is urgent.</p>
+  </div>
+</section>
+
+<!-- ============ KANBAN & RELIABILITY ============ -->
+<section class="section" id="results">
+  <div class="section-head reveal">
+    <p class="section-path">05 · kanban &amp; reliability</p>
+    <h2>From extraction to board</h2>
+  </div>
+
+  <div class="split-grid reveal">
+    <div class="split-col">
+      <h4>— Kanban board</h4>
+      <ul>
+        <li><strong>Native HTML5 drag-and-drop</strong> across To&nbsp;Do / In&nbsp;Progress / Done columns — dragging a card fires a <code>PUT /api/tasks/{task_id}</code> to persist the new status immediately.</li>
+        <li><strong>CSV export</strong> of the current task list for sharing outside the app.</li>
+        <li><strong>Automatic dark mode</strong> via <code>prefers-color-scheme</code>, matching the user's OS setting with no manual toggle needed.</li>
+        <li><strong>One-click AI summary</strong> panel that calls <code>/api/tasks/summary</code> and renders the markdown report inline.</li>
+      </ul>
+    </div>
+    <div class="split-col">
+      <h4>— Test suite</h4>
+      <ul>
+        <li><strong>Isolated per-test database</strong> — a fixture creates a fresh SQLite file before each test and deletes it after, so tests never share state.</li>
+        <li><strong>Full CRUD coverage</strong> — create, list, update, and delete are each exercised through FastAPI's <code>TestClient</code> against real HTTP routes.</li>
+        <li><strong>Mocked LLM calls</strong> — the extraction test monkeypatches <code>llm.extract_tasks_from_text</code>, so the suite runs fast, free, and deterministically without calling the real Gemini API.</li>
+        <li><strong>Static route smoke test</strong> — confirms the frontend's <code>index.html</code> is actually served at <code>/</code>.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECH STACK ============ -->
+<section class="section" id="stack">
+  <div class="section-head reveal">
+    <p class="section-path">06 · tech stack</p>
+    <h2>Built with</h2>
+  </div>
+  <div class="chip-row reveal mt-md">
+    <span class="chip">FastAPI</span>
+    <span class="chip">Google Gemini 2.5 Flash</span>
+    <span class="chip">Pydantic</span>
+    <span class="chip">SQLite</span>
+    <span class="chip">Tenacity</span>
+    <span class="chip">Vanilla JS / HTML5 / CSS</span>
+    <span class="chip">pytest</span>
+    <span class="chip">Uvicorn</span>
+  </div>
+
+  <div class="mt-lg reveal">
+    <div class="table-wrap">
+      <table class="kv">
+        <thead><tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>POST</td><td>/api/tasks/extract</td><td>Extract structured tasks from raw notes</td></tr>
+          <tr><td>GET</td><td>/api/tasks</td><td>List all tasks</td></tr>
+          <tr><td>GET</td><td>/api/tasks/summary</td><td>Generate the AI executive summary</td></tr>
+          <tr><td>GET</td><td>/api/tasks/{task_id}</td><td>Get a single task</td></tr>
+          <tr><td>PUT</td><td>/api/tasks/{task_id}</td><td>Update a task (e.g. on Kanban drag)</td></tr>
+          <tr><td>DELETE</td><td>/api/tasks/{task_id}</td><td>Delete a task</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER NAV ============ -->
+<div class="case-footer-nav reveal">
+  <a href="vocalsql.html">
+    <span class="cf-lbl">← Previous case study</span>
+    <span class="cf-to">VocalSQL</span>
+  </a>
+  <a class="cf-next" href="rl-directional-straddle.html">
+    <span class="cf-lbl">Back to the first →</span>
+    <span class="cf-to">RL Directional Straddle</span>
+  </a>
+</div>
+
+</main>
+
+<footer class="footer">
+  <span>© 2026 Keyurkumar Panchal</span>
+  <span>Ahmedabad, IN — 23.0225°N, 72.5714°E · <span id="local-time">--:--</span></span>
+  <a href="#top">Back to top ↑</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+</body>
+</html>

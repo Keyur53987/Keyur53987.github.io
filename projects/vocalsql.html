@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VocalSQL — Natural Language to SQL — Keyurkumar Panchal</title>
+<meta name="description" content="A self-correcting 7-node LangGraph agent that turns plain English into safe, validated SQL — RAG schema grounding, confidence scoring, and a 9-layer anti-hallucination pipeline.">
+<meta name="theme-color" content="#fbfafc">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%237c3aed'/%3E%3Ctext x='50' y='68' font-family='monospace' font-size='52' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+
+<a href="#top" class="skip-link">Skip to content</a>
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<header class="nav" id="nav">
+  <a href="../index.html" class="nav-mark">kp<span>/</span></a>
+  <nav class="nav-links" id="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#skills">Skills</a>
+    <a href="../index.html#experience">Experience</a>
+    <a href="index.html">Projects</a>
+    <a href="../index.html#contact">Contact</a>
+  </nav>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<main id="top">
+
+<p class="crumb">
+  <a href="../index.html">kp/</a><span class="sep">/</span>
+  <a href="index.html">projects</a><span class="sep">/</span>
+  <span class="current">VocalSQL</span>
+</p>
+
+<!-- ============ HERO ============ -->
+<section class="case-hero">
+  <p class="case-eyebrow">~/projects/VocalSQL · README.md</p>
+  <h1 class="case-title">VocalSQL — Natural Language to SQL</h1>
+  <p class="case-thesis">A self-correcting 7-node LangGraph agent that turns plain-English questions into safe, validated SQL — grounded by RAG schema retrieval, scored for confidence before it runs anything, and backed by a 9-layer defense against hallucinated tables, columns, and queries.</p>
+
+  <div class="case-links">
+    <a class="btn btn-primary" href="https://github.com/Keyur53987/VocalSQL" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+    <a class="btn btn-ghost" href="https://vocalsql.onrender.com/" target="_blank" rel="noopener noreferrer">Live Demo</a>
+    <a class="btn btn-ghost" href="#example">Jump to Worked Example</a>
+  </div>
+
+  <div class="stat-grid reveal">
+    <div class="stat-cell">
+      <span class="num">7</span>
+      <span class="lbl">LangGraph Pipeline Nodes</span>
+    </div>
+    <div class="stat-cell">
+      <span class="num">9</span>
+      <span class="lbl">Anti-Hallucination Layers</span>
+    </div>
+    <div class="stat-cell">
+      <span class="num">≤ 3</span>
+      <span class="lbl">Self-Correction Retries</span>
+    </div>
+    <div class="stat-cell">
+      <span class="num">3</span>
+      <span class="lbl">DB Engines Supported</span>
+    </div>
+  </div>
+</section>
+
+<nav class="case-toc" aria-label="Section contents">
+  <span class="lbl">Contents</span>
+  <a href="#overview">Overview</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#methodology">How It Works</a>
+  <a href="#results">Guardrails</a>
+  <a href="#example">Worked Example</a>
+  <a href="#stack">Tech Stack</a>
+</nav>
+
+<!-- ============ OVERVIEW ============ -->
+<section class="section" id="overview">
+  <div class="section-head reveal">
+    <p class="section-path">01 · overview</p>
+    <h2>The problem</h2>
+  </div>
+  <div class="prose reveal">
+    <p>Asking an LLM to turn a question straight into SQL is easy to demo and risky to ship. A single generation call has no way to check itself — it can reference a column that doesn't exist, silently misjoin two tables, or return a confident, wrong answer with no signal that anything went wrong. For a tool meant to sit in front of a real database, "usually right" isn't good enough.</p>
+    <p>VocalSQL treats text-to-SQL as a <strong>pipeline problem, not a single-call problem</strong>: retrieve the real schema before generating anything, score the model's own confidence before running the query, validate syntax and schema-compliance before execution, and give the model a chance to fix its own mistakes — with a bounded number of retries — before ever falling back to silence rather than a wrong answer.</p>
+    <p>The demo ships with a self-contained <strong>15-table e-commerce schema</strong> (customers, orders, products, inventory, payments, and more) seeded with 2,000+ records, and the same pipeline connects to SQLite, PostgreSQL, or MySQL databases registered at runtime.</p>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section class="section" id="architecture">
+  <div class="section-head reveal">
+    <p class="section-path">02 · architecture</p>
+    <h2>System architecture</h2>
+    <p class="section-sub">A LangGraph state machine — nine nodes, three conditional gates — served behind a FastAPI backend.</p>
+  </div>
+
+  <div class="diagram-card reveal">
+    <span class="diagram-label">Question → grounded SQL → validated answer</span>
+    <div class="pipeline">
+      <div class="pipeline-box on"><span class="t">Router</span><span class="d">Intent + safety<br>keyword gate</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box"><span class="t">Schema RAG</span><span class="d">Top-5 tables<br>ChromaDB</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box"><span class="t">Few-Shot RAG</span><span class="d">Top-3 similar<br>Q→SQL pairs</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box on"><span class="t">SQL Generator</span><span class="d">Llama 3.3 70B<br>temp = 0.0</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box"><span class="t">Confidence</span><span class="d">4-signal fusion<br>0–100 score</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box on"><span class="t">Validator</span><span class="d">Syntax + schema<br>+ safety checks</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box"><span class="t">Executor</span><span class="d">10s timeout<br>guard</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box on"><span class="t">Formatter</span><span class="d">NL answer +<br>data table</span></div>
+    </div>
+
+    <div class="branch-grid">
+      <div class="branch-card">
+        <div class="bc-head">⛒ safety short-circuit</div>
+        <p>The router blocks data-modification intent (DROP / DELETE / UPDATE / INSERT) with zero-cost keyword matching before any LLM call is made, and routes genuinely unclear questions straight to a clarification response.</p>
+      </div>
+      <div class="branch-card">
+        <div class="bc-head">◇ confidence gate</div>
+        <p>If the fused confidence score signals real ambiguity, the graph skips validation entirely and asks the user a clarifying question instead of guessing at intent.</p>
+      </div>
+      <div class="branch-card">
+        <div class="bc-head">↺ self-correction loop</div>
+        <p>An invalid or failed query routes to the corrector, which feeds the exact error back to the LLM and returns to the validator — up to 3 times — before the pipeline gives up gracefully.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-lg reveal">
+    <div class="code-block">
+      <div class="cb-head"><span>app/graph/workflow.py — conditional routing</span><span>LangGraph · StateGraph</span></div>
+      <pre><span class="tok-fn">router</span> → blocked/unclear? → <span class="tok-fn">format_response</span>  <span class="tok-com"># else continue</span>
+     → <span class="tok-fn">retrieve_schema</span> → <span class="tok-fn">retrieve_fewshots</span> → <span class="tok-fn">generate_sql</span>
+     → <span class="tok-fn">confidence_analyzer</span>
+          needs_clarification?      → <span class="tok-fn">format_response</span>
+          else                      → <span class="tok-fn">validate_sql</span>
+               is_valid?             → <span class="tok-fn">execute_sql</span> → <span class="tok-fn">format_response</span>
+               invalid, retries < 3  → <span class="tok-fn">correct_sql</span> ↩ back to validate_sql
+               invalid, retries ≥ 3  → <span class="tok-fn">format_response</span>  <span class="tok-com"># graceful failure</span>
+     execute_sql error, retries < 3  → <span class="tok-fn">correct_sql</span> ↩ back to validate_sql</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="section" id="methodology">
+  <div class="section-head reveal">
+    <p class="section-path">03 · how it works</p>
+    <h2>The seven nodes</h2>
+  </div>
+
+  <div class="step-list reveal">
+    <div class="step-item">
+      <span class="step-num">01</span>
+      <div>
+        <h4>Router</h4>
+        <p>Classifies intent with fast keyword matching — no LLM call yet. Data-modification requests are blocked immediately; everything else is tagged <code>simple_query</code>, <code>aggregation</code>, <code>join_query</code>, or <code>unclear</code> and passed on.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <span class="step-num">02</span>
+      <div>
+        <h4>Schema retriever (RAG)</h4>
+        <p>Embeds the question and pulls the top-5 most relevant table/column descriptions from a ChromaDB vector store, instead of stuffing the model's context with the entire database schema on every call.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <span class="step-num">03</span>
+      <div>
+        <h4>Few-shot retriever (RAG)</h4>
+        <p>Separately retrieves the top-3 most similar past question → SQL pairs, so the generator has concrete, verified patterns to follow rather than inventing SQL style from scratch each time.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <span class="step-num">04</span>
+      <div>
+        <h4>SQL generator</h4>
+        <p>Calls Llama 3.3 70B (via Groq) at <code>temperature = 0.0</code> with a structured prompt combining the retrieved schema, the few-shot examples, and the question — generation is deliberately deterministic, not creative.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <span class="step-num">05</span>
+      <div>
+        <h4>Confidence analyzer</h4>
+        <p>Fuses four signals — schema coverage, few-shot similarity, query complexity, and the LLM's own self-rated confidence — into a single 0–100 score, plus a structured report of which tables were used, what terms were ambiguous, and what assumptions were made. When the score drops below 70 <em>and</em> the model has flagged specific ambiguous terms, the graph short-circuits straight to a clarification question instead of guessing.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <span class="step-num">06</span>
+      <div>
+        <h4>Validator + corrector loop</h4>
+        <p>Three checks run before anything touches the database: <code>sqlglot</code> syntax parsing, schema-compliance (every referenced table/column has to actually exist), and a safety guard restricting execution to single <code>SELECT</code> statements. A failure routes to the corrector, which hands the exact error back to the LLM for a repair attempt — capped at 3 retries — before the pipeline fails gracefully instead of returning something wrong.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <span class="step-num">07</span>
+      <div>
+        <h4>Executor + response formatter</h4>
+        <p>The validated query runs with a 10-second timeout guard, and the result set — along with the SQL that produced it — is turned into a natural-language answer plus a data table for the UI.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GUARDRAILS ============ -->
+<section class="section" id="results">
+  <div class="section-head reveal">
+    <p class="section-path">04 · guardrails</p>
+    <h2>Nine layers against hallucination</h2>
+    <p class="section-sub">Each layer is cheap on its own; stacked together, they catch different failure modes at different stages of the pipeline — before generation, right after it, and as a last-resort repair.</p>
+  </div>
+
+  <div class="table-wrap reveal">
+    <table class="kv">
+      <thead><tr><th>#</th><th>Layer</th><th>Type</th><th>Cost</th><th>What it catches</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Schema scoping via RAG</td><td>Preventive</td><td>~50ms</td><td>Never shows the model a table or column that doesn't exist</td></tr>
+        <tr><td>2</td><td>Few-shot examples</td><td>Preventive</td><td>~30ms</td><td>Anchors generation to real, previously-solved query patterns</td></tr>
+        <tr><td>3</td><td>Temperature 0.0</td><td>Preventive</td><td>Free</td><td>Removes sampling randomness — same question, same SQL</td></tr>
+        <tr><td>4</td><td>Structured prompts</td><td>Preventive</td><td>Free</td><td>Explicit constraints (read-only, dialect, output format) baked into the system prompt</td></tr>
+        <tr><td>5</td><td>sqlglot syntax check</td><td>Detective</td><td>&lt;5ms</td><td>Parses the generated SQL before it ever reaches the database</td></tr>
+        <tr><td>6</td><td>Schema compliance</td><td>Detective</td><td>&lt;1ms</td><td>Cross-checks every referenced table/column against the real schema</td></tr>
+        <tr><td>7</td><td>Safety guards</td><td>Detective</td><td>&lt;1ms</td><td>Rejects anything beyond a single read-only <code>SELECT</code></td></tr>
+        <tr><td>8</td><td>Self-correction loop</td><td>Corrective</td><td>~500ms/retry</td><td>Feeds the exact validator error back to the LLM for a repair attempt, up to 3×</td></tr>
+        <tr class="hl-row"><td>9</td><td>Graceful failure</td><td>Fallback</td><td>Free</td><td>After retries are exhausted, tells the user it couldn't answer confidently — instead of guessing</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="prose mt-lg reveal">
+    <p>The split matters: preventive layers keep bad SQL from being generated in the first place, detective layers catch what slips through before execution, and the corrective layer gives the system one more chance to fix itself — with a hard ceiling so a stubborn failure can't loop forever. Layer 9 is the one that matters most for trust: the system is designed to say <em>"I'm not confident enough to answer that"</em> rather than return a fabricated result.</p>
+  </div>
+</section>
+
+<!-- ============ WORKED EXAMPLE ============ -->
+<section class="section" id="example">
+  <div class="section-head reveal">
+    <p class="section-path">05 · worked example</p>
+    <h2>One question through the pipeline</h2>
+    <p class="section-sub">Schema and output shown are accurate to the live demo database (15-table e-commerce schema); this is an illustrative walkthrough of one query, not a logged benchmark run.</p>
+  </div>
+
+  <div class="example-card reveal">
+    <div class="example-io">
+      <div>
+        <span class="io-label">Natural-language question</span>
+        <p class="io-text">"Who are the top 5 customers by total spend in the last 90 days?"</p>
+      </div>
+      <div>
+        <span class="io-label">Tables identified</span>
+        <p class="io-text"><code>customers</code>, <code>orders</code></p>
+      </div>
+    </div>
+    <div class="code-block" style="border:none; border-top:1px solid var(--line-soft);">
+      <div class="cb-head"><span>generated_sql</span><span>SQLite dialect</span></div>
+      <pre><span class="tok-kw">SELECT</span>
+    c.first_name || <span class="tok-str">' '</span> || c.last_name <span class="tok-kw">AS</span> customer_name,
+    c.customer_tier,
+    <span class="tok-fn">ROUND</span>(<span class="tok-fn">SUM</span>(o.total_amount), 2) <span class="tok-kw">AS</span> total_spend,
+    <span class="tok-fn">COUNT</span>(o.id) <span class="tok-kw">AS</span> order_count
+<span class="tok-kw">FROM</span> customers c
+<span class="tok-kw">JOIN</span> orders o <span class="tok-kw">ON</span> o.customer_id = c.id
+<span class="tok-kw">WHERE</span> o.order_date &gt;= date(<span class="tok-str">'now'</span>, <span class="tok-str">'-90 days'</span>)
+  <span class="tok-kw">AND</span> o.status != <span class="tok-str">'cancelled'</span>
+<span class="tok-kw">GROUP BY</span> c.id
+<span class="tok-kw">ORDER BY</span> total_spend <span class="tok-kw">DESC</span>
+<span class="tok-kw">LIMIT</span> 5;</pre>
+    </div>
+    <div class="example-io">
+      <div>
+        <span class="io-label">Confidence report</span>
+        <p class="io-text">Score <strong style="color:var(--purple-deep)">91 / 100</strong> · Risk level <strong>Low</strong><br>Signals: high schema coverage, close few-shot match, moderate join complexity</p>
+      </div>
+      <div>
+        <span class="io-label">Assumption logged</span>
+        <p class="io-text">"Last 90 days" resolved relative to the current date; cancelled orders excluded from spend totals.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECH STACK ============ -->
+<section class="section" id="stack">
+  <div class="section-head reveal">
+    <p class="section-path">06 · tech stack</p>
+    <h2>Built with</h2>
+  </div>
+  <div class="chip-row reveal mt-md">
+    <span class="chip">FastAPI</span>
+    <span class="chip">LangGraph</span>
+    <span class="chip">LangChain-Groq</span>
+    <span class="chip">Llama 3.3 70B</span>
+    <span class="chip">ChromaDB</span>
+    <span class="chip">sqlglot</span>
+    <span class="chip">SQLAlchemy</span>
+    <span class="chip">Pydantic</span>
+    <span class="chip">SQLite / PostgreSQL / MySQL</span>
+  </div>
+
+  <div class="mt-lg reveal">
+    <div class="table-wrap">
+      <table class="kv">
+        <thead><tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>POST</td><td>/api/query</td><td>Convert a natural-language question to SQL and execute it</td></tr>
+          <tr><td>POST</td><td>/api/feedback</td><td>Submit a correction to improve future queries</td></tr>
+          <tr><td>GET</td><td>/api/databases</td><td>List registered databases</td></tr>
+          <tr><td>POST</td><td>/api/databases</td><td>Register a new database connection</td></tr>
+          <tr><td>DELETE</td><td>/api/databases/{id}</td><td>Remove a registered database</td></tr>
+          <tr><td>POST</td><td>/api/databases/{id}/reindex</td><td>Re-index a database's schema into ChromaDB</td></tr>
+          <tr><td>GET</td><td>/api/health</td><td>Health check</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER NAV ============ -->
+<div class="case-footer-nav reveal">
+  <a href="rl-directional-straddle.html">
+    <span class="cf-lbl">← Previous case study</span>
+    <span class="cf-to">RL Directional Straddle</span>
+  </a>
+  <a class="cf-next" href="taskiq.html">
+    <span class="cf-lbl">Next case study →</span>
+    <span class="cf-to">TaskIQ</span>
+  </a>
+</div>
+
+</main>
+
+<footer class="footer">
+  <span>© 2026 Keyurkumar Panchal</span>
+  <span>Ahmedabad, IN — 23.0225°N, 72.5714°E · <span id="local-time">--:--</span></span>
+  <a href="#top">Back to top ↑</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+</body>
+</html>

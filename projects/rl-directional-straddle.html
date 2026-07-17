@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autonomous Options Trading &amp; Hedging with Deep RL — Keyurkumar Panchal</title>
+<meta name="description" content="MaskablePPO agent trading and hedging NIFTY50 weekly straddles from a 69-feature option-Greeks state space. Architecture, methodology, and 2025 out-of-sample results.">
+<meta name="theme-color" content="#fbfafc">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%237c3aed'/%3E%3Ctext x='50' y='68' font-family='monospace' font-size='52' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body>
+
+<a href="#top" class="skip-link">Skip to content</a>
+<div class="scroll-progress" id="scroll-progress"></div>
+
+<header class="nav" id="nav">
+  <a href="../index.html" class="nav-mark">kp<span>/</span></a>
+  <nav class="nav-links" id="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#skills">Skills</a>
+    <a href="../index.html#experience">Experience</a>
+    <a href="index.html">Projects</a>
+    <a href="../index.html#contact">Contact</a>
+  </nav>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<main id="top">
+
+<p class="crumb">
+  <a href="../index.html">kp/</a><span class="sep">/</span>
+  <a href="index.html">projects</a><span class="sep">/</span>
+  <span class="current">rl_directional_straddle</span>
+</p>
+
+<!-- ============ HERO ============ -->
+<section class="case-hero">
+  <p class="case-eyebrow">~/projects/rl_directional_straddle · README.md</p>
+  <h1 class="case-title">Autonomous Options Trading &amp; Hedging with Deep Reinforcement Learning</h1>
+  <p class="case-thesis">A MaskablePPO agent that learns, directly from a 69-feature option-Greeks state space, how to enter, hedge, and unwind multi-leg straddle and strangle positions on the NIFTY50 index — replacing hand-coded Black-Scholes hedging rules with a policy trained on 1-minute market data.</p>
+
+  <div class="case-links">
+    <a class="btn btn-primary" href="https://github.com/Keyur53987/rl_directional_straddle" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+    <a class="btn btn-ghost" href="#results">Jump to Results</a>
+  </div>
+
+  <div class="stat-grid reveal">
+    <div class="stat-cell">
+      <span class="num">₹5,61,919</span>
+      <span class="lbl">Total Net PnL</span>
+    </div>
+    <div class="stat-cell">
+      <span class="num">93.75%</span>
+      <span class="lbl">Win Rate (weekly episodes)</span>
+    </div>
+    <div class="stat-cell">
+      <span class="num">47.66</span>
+      <span class="lbl">Profit Factor</span>
+    </div>
+    <div class="stat-cell">
+      <span class="num">₹66,540</span>
+      <span class="lbl">Max Drawdown</span>
+    </div>
+  </div>
+</section>
+
+<nav class="case-toc" aria-label="Section contents">
+  <span class="lbl">Contents</span>
+  <a href="#overview">Overview</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#methodology">Methodology</a>
+  <a href="#results">Results</a>
+  <a href="#discussion">Discussion &amp; Limitations</a>
+  <a href="#stack">Tech Stack</a>
+</nav>
+
+<!-- ============ OVERVIEW ============ -->
+<section class="section" id="overview">
+  <div class="section-head reveal">
+    <p class="section-path">01 · overview</p>
+    <h2>The problem</h2>
+  </div>
+  <div class="prose reveal">
+    <p>Standard options hedging leans on Black-Scholes: continuous trading, constant volatility, no transaction costs, no discrete strikes. Real NSE intraday markets break every one of those assumptions — spreads widen, volatility clusters and jumps, and every rebalance costs money. A fixed delta-hedging rule doesn't adapt to any of that.</p>
+    <p>This project reframes hedging as a <strong>sequential decision problem</strong> instead of a formula. An agent observes the market and its own position, and at every one-minute step chooses whether to enter, add to, reduce, or exit a short/long straddle — learning the policy from experience rather than from a closed-form model. The scope is deliberately narrow and realistic: <strong>weekly at-the-money NIFTY50 straddles and strangles</strong>, trained and evaluated on real 1-minute NSE spot and India VIX data, with transaction costs, slippage, and a dynamic exchange-style margin model all simulated in the loop.</p>
+    <p>Three algorithms were trained and compared — <strong>PPO</strong> and <strong>A2C</strong> as baselines, and <strong>Maskable PPO</strong> as the primary agent, which is the version this write-up focuses on. The work is published as <em>“Direct Reinforcement for Derivatives: Enhancing Intraday Deep Hedging via Risk-Averse Reward Shaping”</em> (GCon 2026).</p>
+  </div>
+</section>
+
+<!-- ============ ARCHITECTURE ============ -->
+<section class="section" id="architecture">
+  <div class="section-head reveal">
+    <p class="section-path">02 · architecture</p>
+    <h2>System architecture</h2>
+    <p class="section-sub">A Gymnasium environment simulating the NIFTY50 options market, wrapped by a masked actor-critic policy trained with Stable-Baselines3 / sb3-contrib.</p>
+  </div>
+
+  <div class="diagram-card reveal">
+    <span class="diagram-label">Data → decision → execution loop</span>
+    <div class="pipeline">
+      <div class="pipeline-box on"><span class="t">Market Data</span><span class="d">NIFTY50 1-min OHLC<br>+ India VIX</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box"><span class="t">Feature Engine</span><span class="d">Black-Scholes Greeks<br>+ vol estimators</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box"><span class="t">State (69-d)</span><span class="d">Gymnasium<br>Box observation</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box on"><span class="t">MaskablePPO</span><span class="d">Actor-critic policy<br>+ action mask</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box"><span class="t">Action</span><span class="d">1 of 8 discrete<br>position moves</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box"><span class="t">Execution</span><span class="d">Fill, SPAN-like<br>margin, txn cost</span></div>
+      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-box on"><span class="t">Reward</span><span class="d">Multi-horizon PnL<br>− drawdown penalty</span></div>
+    </div>
+
+    <div class="branch-grid">
+      <div class="branch-card">
+        <div class="bc-head">↺ training loop</div>
+        <p>Reward flows into a rollout buffer; every 1,024 steps × 4 parallel envs, PPO's clipped surrogate objective updates the policy and value networks, and the loop continues into the next minute of the episode.</p>
+      </div>
+      <div class="branch-card">
+        <div class="bc-head">⛒ action masking</div>
+        <p>Before the policy samples an action, the environment computes a live boolean mask from current position, lot limits, and available margin — e.g. <code>ENTER_LONG</code> is masked out unless margin ≤ available cash. Invalid actions never enter the loss.</p>
+      </div>
+      <div class="branch-card">
+        <div class="bc-head">📐 margin model</div>
+        <p>Short legs are margined with a dynamic SPAN-like calculator: a 3.5σ price scan at +25% stressed IV plus a 3% notional exposure add-on, recomputed every step as spot and IV move.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-lg reveal">
+    <div class="code-block">
+      <div class="cb-head"><span>rl_directional_straddle/ — repository structure</span><span>Python · Gymnasium</span></div>
+      <pre><span class="tok-com"># Custom environments</span>
+envs/intraday_option_env_maskPPO_v3.py   <span class="tok-com"># v3 — 69 features, Discrete(8), action masking (this write-up)</span>
+envs/intraday_option_env_maskPPO.py      <span class="tok-com"># v2 — 67 features, Maskable PPO</span>
+envs/intraday_option_env.py              <span class="tok-com"># v1 — 65 features, MultiDiscrete([3,3]), PPO/A2C baseline</span>
+
+<span class="tok-com"># Training & evaluation</span>
+Mask_PPO_train_v3.py                     <span class="tok-com"># primary entry point — 4 parallel envs</span>
+Mask_PPO_explainability_test.py          <span class="tok-com"># out-of-sample eval + SHAP export</span>
+PPO_train.py · A2C_train.py              <span class="tok-com"># baseline algorithms</span>
+walk_forward_validation.py               <span class="tok-com"># walk-forward harness</span>
+
+<span class="tok-com"># Config & utilities</span>
+Mask_PPO_config_v3.py                    <span class="tok-com"># reward weights, margin, contract specs</span>
+utils/black_scholes.py                   <span class="tok-com"># analytical Greeks (Δ Γ ν Θ Vanna Volga)</span>
+utils/feature_calculator.py              <span class="tok-com"># RSI, Bollinger, ATR, MACD, vol estimators</span>
+
+<span class="tok-com"># Dashboards</span>
+dashboard.py                             <span class="tok-com"># Streamlit live backtest viewer</span>
+explainability_dashboard.py              <span class="tok-com"># Plotly HTML SHAP / drawdown report</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============ METHODOLOGY ============ -->
+<section class="section" id="methodology">
+  <div class="section-head reveal">
+    <p class="section-path">03 · methodology</p>
+    <h2>How it works</h2>
+  </div>
+
+  <div class="step-list reveal">
+    <div class="step-item">
+      <span class="step-num">01</span>
+      <div>
+        <h4>A 69-feature state space</h4>
+        <p>Every one-minute step, the environment assembles a <code>Box(69,)</code> observation from ten feature groups — volatility estimators, price action, option Greeks, technicals, position state, and time context:</p>
+        <div class="table-wrap mt-md">
+          <table class="kv">
+            <thead><tr><th>Group</th><th>Count</th><th>Contents</th></tr></thead>
+            <tbody>
+              <tr><td>Volatility</td><td>15</td><td>Rolling realized vol (5m→15d), Parkinson &amp; Garman-Klass estimators, vol percentile, vol-of-vol, vol trend, IV−RV spread</td></tr>
+              <tr><td>Price &amp; returns</td><td>10</td><td>Normalized close, multi-window returns, VWAP distance, day-range position, momentum</td></tr>
+              <tr><td>Option Greeks</td><td>15</td><td>Per-leg CE/PE Delta, Gamma, Vega, Theta, Vanna, Volga (Black-Scholes) + net position Delta/Gamma/Vega exposure</td></tr>
+              <tr><td>Technicals</td><td>6</td><td>RSI, MACD line/signal/histogram, Bollinger position, ATR</td></tr>
+              <tr><td>Position state</td><td>10</td><td>CE/PE lot counts, CE:PE ratio, premium deployed, strike distances, entry prices, running PnL</td></tr>
+              <tr><td>Time</td><td>4</td><td>Minutes since open, minutes to close, sine/cosine time-of-day encoding</td></tr>
+              <tr><td>Risk metrics</td><td>3</td><td>Distance from peak PnL, running max drawdown, 30-step rolling Sharpe</td></tr>
+              <tr><td>Session context</td><td>2</td><td>Fraction of episode elapsed, overnight-gap flag</td></tr>
+              <tr><td>Position identity</td><td>2</td><td>Side encoding (+1 long / −1 short / 0 flat), normalized position duration</td></tr>
+              <tr class="hl-row"><td>Per-leg PnL <span style="color:var(--purple-deep)">(v3)</span></td><td>2</td><td>Separate unrealized CE and PE PnL — new in v3, isolates which leg is driving reward</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <span class="step-num">02</span>
+      <div>
+        <h4>Discrete(8) action space, with masking</h4>
+        <p>The agent chooses one of eight discrete moves each step: <code>HOLD</code>, <code>ENTER LONG</code>, <code>ENTER SHORT</code>, <code>EXIT ALL</code>, <code>ADD CE</code>, <code>ADD PE</code>, <code>REDUCE CE</code>, <code>REDUCE PE</code>. Before sampling, the environment computes a live boolean mask — e.g. entry actions are disabled whenever the SPAN-like margin required would exceed available cash, and leg-reduction actions are disabled below a 1-lot floor. Invalid actions are removed at the logit level rather than sampled and penalized after the fact, which is what let the agent skip past the trial-and-error of learning “that action was illegal” from scratch.</p>
+        <p>This is the third iteration of the action design:</p>
+        <div class="table-wrap mt-md">
+          <table class="kv">
+            <thead><tr><th>Version</th><th>Action space</th><th>Design</th></tr></thead>
+            <tbody>
+              <tr><td>v1</td><td>MultiDiscrete([3,3])</td><td>Independent 3-way choice per leg (base PPO/A2C environment, 65 features)</td></tr>
+              <tr><td>v2</td><td>Discrete(8), masked</td><td>Joint action enumeration + Maskable PPO (67 features)</td></tr>
+              <tr class="hl-row"><td>v3</td><td>Discrete(8), masked</td><td>Same action space as v2, now paired with the 69-feature state and multi-horizon reward below</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <span class="step-num">03</span>
+      <div>
+        <h4>Multi-horizon, risk-averse reward</h4>
+        <p>An earlier single-horizon reward pushed the agent toward myopic, overtraded behavior. v3 blends three PnL horizons tuned to a ~1,875-step weekly episode, plus a drawdown penalty and two terminal shaping terms:</p>
+        <div class="formula mt-md">R = 0.15 · PnL<sub>1-step</sub> + 0.60 · PnL<sub>30-step</sub> + 0.25 · PnL<sub>120-step</sub> − λ · ΔDrawdown</div>
+        <p class="mt-md">The 30-step (half-hour) term dominates the blend as the primary trend signal, the 1-step term keeps the agent reactive to sudden IV shocks, and the 120-step term rewards holding through a correct half-day regime call. <code>λ</code> penalizes only <em>increases</em> in drawdown rather than its absolute level, so the agent isn't punished for simply holding a position that is currently underwater without getting worse. A terminal win bonus and a no-trade penalty round out the episode-level incentives.</p>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <span class="step-num">04</span>
+      <div>
+        <h4>Solving the “sit on hands” equilibrium</h4>
+        <p>Early training runs converged to a degenerate policy: since <code>HOLD</code> guarantees <code>Reward = 0</code> and a random untrained agent loses money from spread and transaction costs, the agent learned that doing nothing dominates trading — and never explored enough to discover that skilled trading is profitable.</p>
+        <p>The fix implemented here is <strong>randomized forced entry</strong>, a curriculum-learning trick sometimes called “training wheels”: on <code>reset()</code>, a coin flip decides whether the episode starts flat (agent decides if/when to enter — teaches <em>timing</em>) or with a position already forced on at 9:30&nbsp;AM (agent must manage it — teaches <em>management</em>). Once the agent learns from the forced episodes that managing a position is profitable, that positive value function transfers into the free episodes and it starts entering on its own — all without hand-biasing the reward function itself.</p>
+      </div>
+    </div>
+
+    <div class="step-item">
+      <span class="step-num">05</span>
+      <div>
+        <h4>Training protocol</h4>
+        <p>Trained with Maskable PPO from <code>sb3-contrib</code> across 4 parallel environments, on multi-year NIFTY50 1-minute OHLC + India VIX data, with weekly Wednesday→Tuesday episodes matching the NIFTY expiry cycle. Evaluated fully out-of-sample on 2025 data never seen during training.</p>
+        <div class="table-wrap mt-md">
+          <table class="kv kv-pairs">
+            <tbody>
+              <tr><td>Learning rate</td><td>7 × 10⁻⁴</td><td>Batch size</td><td>256</td></tr>
+              <tr><td>n_steps</td><td>1,024</td><td>Parallel envs</td><td>4</td></tr>
+              <tr><td>γ (gamma)</td><td>0.9995</td><td>Entropy coef.</td><td>0.05</td></tr>
+              <tr><td>Total timesteps</td><td>1,500,000</td><td>Lot size</td><td>65 (NIFTY)</td></tr>
+              <tr><td>Strike gap</td><td>₹50</td><td>Short strike offset</td><td>±100 OTM</td></tr>
+              <tr><td>Txn cost + slippage</td><td>0.5% per trade</td><td>Initial capital</td><td>₹10,00,000</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESULTS ============ -->
+<section class="section" id="results">
+  <div class="section-head reveal">
+    <p class="section-path">04 · results</p>
+    <h2>Results — 2025 out-of-sample test</h2>
+    <p class="section-sub">48 weekly episodes across 2025, entirely unseen during training. All figures below are read directly from the model's own logged evaluation output.</p>
+  </div>
+
+  <div class="stack reveal">
+    <div class="chart-card">
+      <h4>Monthly P&amp;L</h4>
+      <p class="chart-figure-title">Out-of-sample net P&amp;L by month, 2025</p>
+      <div style="overflow-x:auto;">
+        <svg class="chart-svg" viewBox="0 0 640 260" style="min-width:560px;" role="img" aria-label="Bar chart of monthly profit and loss for 2025, ranging from about 13 thousand rupees in April to about 111 thousand rupees in May">
+          <line x1="46" y1="230.0" x2="630" y2="230.0" stroke="var(--line)" stroke-width="1"/>
+          <text x="38" y="233.0" font-size="9" text-anchor="end">0</text>
+          <line x1="46" y1="185.4" x2="630" y2="185.4" stroke="var(--line-soft)" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="38" y="188.4" font-size="9" text-anchor="end">25K</text>
+          <line x1="46" y1="140.8" x2="630" y2="140.8" stroke="var(--line-soft)" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="38" y="143.8" font-size="9" text-anchor="end">50K</text>
+          <line x1="46" y1="96.2" x2="630" y2="96.2" stroke="var(--line-soft)" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="38" y="99.2" font-size="9" text-anchor="end">75K</text>
+          <line x1="46" y1="51.7" x2="630" y2="51.7" stroke="var(--line-soft)" stroke-width="1" stroke-dasharray="3,3"/>
+          <text x="38" y="54.7" font-size="9" text-anchor="end">100K</text>
+
+          <rect x="46.0" y="136.6" width="39.5" height="93.4" fill="var(--purple)" opacity="0.88"><title>Jan 2025 — Rs 52,364</title></rect>
+          <text x="65.8" y="244" font-size="9" text-anchor="middle">Jan</text>
+          <rect x="95.5" y="130.5" width="39.5" height="99.5" fill="var(--purple)" opacity="0.88"><title>Feb 2025 — Rs 55,791</title></rect>
+          <text x="115.2" y="244" font-size="9" text-anchor="middle">Feb</text>
+          <rect x="145.0" y="135.6" width="39.5" height="94.4" fill="var(--purple)" opacity="0.88"><title>Mar 2025 — Rs 52,958</title></rect>
+          <text x="164.8" y="244" font-size="9" text-anchor="middle">Mar</text>
+          <rect x="194.5" y="206.6" width="39.5" height="23.4" fill="var(--purple)" opacity="0.6"><title>Apr 2025 — Rs 13,099 (weakest month)</title></rect>
+          <text x="214.2" y="244" font-size="9" text-anchor="middle">Apr</text>
+          <rect x="244.0" y="31.6" width="39.5" height="198.4" fill="var(--purple-deep)" opacity="0.95"><title>May 2025 — Rs 1,11,226 (strongest month)</title></rect>
+          <text x="263.8" y="244" font-size="9" text-anchor="middle">May</text>
+          <rect x="293.5" y="100.5" width="39.5" height="129.5" fill="var(--purple)" opacity="0.88"><title>Jun 2025 — Rs 72,617</title></rect>
+          <text x="313.2" y="244" font-size="9" text-anchor="middle">Jun</text>
+          <rect x="343.0" y="107.2" width="39.5" height="122.8" fill="var(--purple)" opacity="0.88"><title>Jul 2025 — Rs 68,845</title></rect>
+          <text x="362.8" y="244" font-size="9" text-anchor="middle">Jul</text>
+          <rect x="392.5" y="102.1" width="39.5" height="127.9" fill="var(--purple)" opacity="0.88"><title>Aug 2025 — Rs 71,705</title></rect>
+          <text x="412.2" y="244" font-size="9" text-anchor="middle">Aug</text>
+          <rect x="442.0" y="134.1" width="39.5" height="95.9" fill="var(--purple)" opacity="0.88"><title>Sep 2025 — Rs 53,795</title></rect>
+          <text x="461.8" y="244" font-size="9" text-anchor="middle">Sep</text>
+          <rect x="491.5" y="150.3" width="39.5" height="79.7" fill="var(--purple)" opacity="0.88"><title>Oct 2025 — Rs 44,705</title></rect>
+          <text x="511.2" y="244" font-size="9" text-anchor="middle">Oct</text>
+          <rect x="541.0" y="147.3" width="39.5" height="82.7" fill="var(--purple)" opacity="0.88"><title>Nov 2025 — Rs 46,371</title></rect>
+          <text x="560.8" y="244" font-size="9" text-anchor="middle">Nov</text>
+          <rect x="590.5" y="128.7" width="39.5" height="101.3" fill="var(--purple)" opacity="0.88"><title>Dec 2025 — Rs 56,804</title></rect>
+          <text x="610.2" y="244" font-size="9" text-anchor="middle">Dec</text>
+        </svg>
+      </div>
+      <p class="chart-caption">Every month in the 2025 test window closed net positive. April was the weakest month (₹13,099) during a spike in realized drawdown; May was the strongest (₹1,11,226). Axis in ₹.</p>
+    </div>
+
+    <div class="chart-card">
+      <h4>Explainability</h4>
+      <p class="chart-figure-title">SHAP feature importance — top 10 of 69</p>
+      <div style="overflow-x:auto;">
+        <svg class="chart-svg" viewBox="0 0 640 300" style="min-width:560px;" role="img" aria-label="Horizontal bar chart of SHAP feature importance, led by pe_vanna, ce_theta, and vol_trend">
+          <text x="138" y="27.0" font-size="10" text-anchor="end">pe_vanna</text>
+          <rect x="148" y="17.0" width="421.2" height="14" fill="var(--purple)" opacity="0.95"><title>pe_vanna: 0.151</title></rect>
+          <text x="575.2" y="27.0" font-size="9.5" fill="var(--ink-faint)">0.151</text>
+          <text x="138" y="55.0" font-size="10" text-anchor="end">ce_theta</text>
+          <rect x="148" y="45.0" width="291.3" height="14" fill="var(--purple)" opacity="0.83"><title>ce_theta: 0.104</title></rect>
+          <text x="445.3" y="55.0" font-size="9.5" fill="var(--ink-faint)">0.104</text>
+          <text x="138" y="83.0" font-size="10" text-anchor="end">vol_trend</text>
+          <rect x="148" y="73.0" width="258.7" height="14" fill="var(--purple)" opacity="0.8"><title>vol_trend: 0.093</title></rect>
+          <text x="412.7" y="83.0" font-size="9.5" fill="var(--ink-faint)">0.093</text>
+          <text x="138" y="111.0" font-size="10" text-anchor="end">time_cosine</text>
+          <rect x="148" y="101.0" width="196.0" height="14" fill="var(--purple)" opacity="0.74"><title>time_cosine: 0.070</title></rect>
+          <text x="350.0" y="111.0" font-size="9.5" fill="var(--ink-faint)">0.070</text>
+          <text x="138" y="139.0" font-size="10" text-anchor="end">minutes_to_close</text>
+          <rect x="148" y="129.0" width="194.8" height="14" fill="var(--purple)" opacity="0.74"><title>minutes_to_close: 0.070</title></rect>
+          <text x="348.8" y="139.0" font-size="9.5" fill="var(--ink-faint)">0.070</text>
+          <text x="138" y="167.0" font-size="10" text-anchor="end">ce_vanna</text>
+          <rect x="148" y="157.0" width="184.0" height="14" fill="var(--purple)" opacity="0.72"><title>ce_vanna: 0.066</title></rect>
+          <text x="338.0" y="167.0" font-size="9.5" fill="var(--ink-faint)">0.066</text>
+          <text x="138" y="195.0" font-size="10" text-anchor="end">ce_vega</text>
+          <rect x="148" y="185.0" width="178.4" height="14" fill="var(--purple)" opacity="0.72"><title>ce_vega: 0.064</title></rect>
+          <text x="332.4" y="195.0" font-size="9.5" fill="var(--ink-faint)">0.064</text>
+          <text x="138" y="223.0" font-size="10" text-anchor="end">pe_theta</text>
+          <rect x="148" y="213.0" width="172.5" height="14" fill="var(--purple)" opacity="0.71"><title>pe_theta: 0.062</title></rect>
+          <text x="326.5" y="223.0" font-size="9.5" fill="var(--ink-faint)">0.062</text>
+          <text x="138" y="251.0" font-size="10" text-anchor="end">position_side_enc</text>
+          <rect x="148" y="241.0" width="160.0" height="14" fill="var(--purple)" opacity="0.7"><title>position_side_enc: 0.057</title></rect>
+          <text x="314.0" y="251.0" font-size="9.5" fill="var(--ink-faint)">0.057</text>
+          <text x="138" y="279.0" font-size="10" text-anchor="end">pe_vega</text>
+          <rect x="148" y="269.0" width="142.7" height="14" fill="var(--purple)" opacity="0.69"><title>pe_vega: 0.051</title></rect>
+          <text x="296.7" y="279.0" font-size="9.5" fill="var(--ink-faint)">0.051</text>
+        </svg>
+      </div>
+      <p class="chart-caption">Computed post-hoc with SHAP over the explainability test run. The put leg's Vanna and the call leg's Theta dominate — consistent with a short-strangle book where IV/spot cross-sensitivity and time decay of the richer leg drive most of the agent's decisions, ahead of raw price momentum.</p>
+    </div>
+  </div>
+
+  <div class="prose mt-lg reveal">
+    <p>Read together, the two charts tell a consistent story: the agent's edge is concentrated in <strong>risk management under volatility regime shifts</strong> rather than pure directional prediction — the top features are option-sensitivity terms (Vanna, Theta, Vega) and volatility trend, not price momentum. That lines up with the reward design: the multi-horizon blend was built to reward exactly this kind of regime-aware position management.</p>
+  </div>
+</section>
+
+<!-- ============ DISCUSSION & LIMITATIONS ============ -->
+<section class="section" id="discussion">
+  <div class="section-head reveal">
+    <p class="section-path">05 · discussion</p>
+    <h2>Discussion &amp; limitations</h2>
+    <p class="section-sub">A backtest is not a live market. These are the gaps between what's simulated here and full production readiness.</p>
+  </div>
+
+  <div class="split-grid reveal">
+    <div class="split-col">
+      <h4>— Limitations</h4>
+      <ul>
+        <li><strong>Static cost model.</strong> Transaction cost and slippage are applied as a flat 0.5% rather than an order-book-aware, liquidity-dependent estimate.</li>
+        <li><strong>Discrete strike grid.</strong> The agent trades ATM ± a fixed offset; it doesn't choose strikes continuously or react to skew shape directly.</li>
+        <li><strong>Simulated fills.</strong> Execution assumes the quoted price fills instantly at the requested size — no queue position, partial fills, or latency.</li>
+        <li><strong>Single underlying.</strong> Trained and evaluated only on NIFTY50; hedging correlated multi-asset books is untested.</li>
+        <li><strong>Backtest–live gap.</strong> Strong out-of-sample numbers on historical data are necessary but not sufficient evidence for live performance.</li>
+      </ul>
+    </div>
+    <div class="split-col">
+      <h4>— Future work</h4>
+      <ul>
+        <li><strong>Continuous control (SAC / TD3)</strong> to size positions and choose strikes/offsets continuously instead of from a fixed discrete menu.</li>
+        <li><strong>Order-book features</strong> — bid-ask depth and imbalance — to move the cost model from static to microstructure-aware.</li>
+        <li><strong>Sequence models</strong> (LSTM / Transformer encoders) in place of the flat feature vector, to let the policy learn temporal structure directly.</li>
+        <li><strong>Multi-asset hedging</strong> across correlated indices and single-stock options.</li>
+        <li><strong>Adaptive transaction-cost modeling</strong> that scales with realized liquidity instead of a fixed percentage.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TECH STACK ============ -->
+<section class="section" id="stack">
+  <div class="section-head reveal">
+    <p class="section-path">06 · tech stack</p>
+    <h2>Built with</h2>
+  </div>
+  <div class="chip-row reveal mt-md">
+    <span class="chip">Python</span>
+    <span class="chip">Gymnasium</span>
+    <span class="chip">Stable-Baselines3</span>
+    <span class="chip">sb3-contrib (MaskablePPO)</span>
+    <span class="chip">Pandas / NumPy</span>
+    <span class="chip">SciPy</span>
+    <span class="chip">SHAP</span>
+    <span class="chip">Plotly</span>
+    <span class="chip">Streamlit</span>
+    <span class="chip">Matplotlib</span>
+  </div>
+
+  <div class="pub-card mt-lg reveal">
+    <span class="pc-eyebrow">Publication</span>
+    <span class="pc-title">“Direct Reinforcement for Derivatives: Enhancing Intraday Deep Hedging via Risk-Averse Reward Shaping”</span>
+    <span class="pc-meta">In Proceedings, GCon 2026</span>
+  </div>
+</section>
+
+<!-- ============ FOOTER NAV ============ -->
+<div class="case-footer-nav reveal">
+  <a href="index.html">
+    <span class="cf-lbl">← Back to</span>
+    <span class="cf-to">All Projects</span>
+  </a>
+  <a class="cf-next" href="vocalsql.html">
+    <span class="cf-lbl">Next case study →</span>
+    <span class="cf-to">VocalSQL</span>
+  </a>
+</div>
+
+</main>
+
+<footer class="footer">
+  <span>© 2026 Keyurkumar Panchal</span>
+  <span>Ahmedabad, IN — 23.0225°N, 72.5714°E · <span id="local-time">--:--</span></span>
+  <a href="#top">Back to top ↑</a>
+</footer>
+
+<script src="../assets/js/site.js" defer></script>
+</body>
+</html>
