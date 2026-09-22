@@ -9,40 +9,41 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%237c3aed'/%3E%3Ctext x='50' y='68' font-family='monospace' font-size='52' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/site.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Neucha&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
 </head>
-<body>
+<body class="sticky-page">
 
 <a href="#top" class="skip-link">Skip to content</a>
 <div class="scroll-progress" id="scroll-progress"></div>
 
-<header class="nav" id="nav">
-  <a href="../index.html" class="nav-mark">kp<span>/</span></a>
-  <nav class="nav-links" id="nav-links">
-    <a href="../index.html#about">About</a>
-    <a href="../index.html#skills">Skills</a>
-    <a href="../index.html#experience">Experience</a>
-    <a href="index.html">Projects</a>
-    <a href="../index.html#contact">Contact</a>
-  </nav>
-  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
-    <span></span><span></span><span></span>
-  </button>
-</header>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="../index.html" aria-label="Home">Keyurkumar Panchal</a>
+    <button class="nav-toggle" onclick="toggleNav()" aria-label="Open menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#skills">Skills</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="index.html">Projects</a>
+      <a href="../index.html#contact">Contact</a>
+      <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">☾</button>
+    </div>
+  </div>
+</nav>
 
 <main id="top">
+<div class="paper-wrapper">
 
-<p class="crumb">
-  <a href="../index.html">kp/</a><span class="sep">/</span>
-  <a href="index.html">projects</a><span class="sep">/</span>
-  <span class="current">rl_directional_straddle</span>
-</p>
 
 <!-- ============ HERO ============ -->
-<section class="case-hero">
+<section class="detail-header">
   <p class="case-eyebrow">~/projects/rl_directional_straddle · README.md</p>
-  <h1 class="case-title">Autonomous Options Trading &amp; Hedging with Deep Reinforcement Learning</h1>
+  <h1>Autonomous Options Trading &amp; Hedging with Deep Reinforcement Learning</h1>
   <p class="case-thesis">A MaskablePPO agent that learns, directly from a 69-feature option-Greeks state space, how to enter, hedge, and unwind multi-leg straddle and strangle positions on the NIFTY50 index — replacing hand-coded Black-Scholes hedging rules with a policy trained on 1-minute market data.</p>
 
   <div class="case-links">
@@ -50,35 +51,12 @@
     <a class="btn btn-ghost" href="#results">Jump to Results</a>
   </div>
 
-  <div class="stat-grid reveal">
-    <div class="stat-cell">
-      <span class="num">₹5,61,919</span>
-      <span class="lbl">Total Net PnL</span>
-    </div>
-    <div class="stat-cell">
-      <span class="num">93.75%</span>
-      <span class="lbl">Win Rate (weekly episodes)</span>
-    </div>
-    <div class="stat-cell">
-      <span class="num">47.66</span>
-      <span class="lbl">Profit Factor</span>
-    </div>
-    <div class="stat-cell">
-      <span class="num">₹66,540</span>
-      <span class="lbl">Max Drawdown</span>
-    </div>
-  </div>
 </section>
 
-<nav class="case-toc" aria-label="Section contents">
-  <span class="lbl">Contents</span>
-  <a href="#overview">Overview</a>
-  <a href="#architecture">Architecture</a>
-  <a href="#methodology">Methodology</a>
-  <a href="#results">Results</a>
-  <a href="#discussion">Discussion &amp; Limitations</a>
-  <a href="#stack">Tech Stack</a>
-</nav>
+<div class="tldr-box reveal" style="margin-top: 40px;">
+  <strong>TL;DR</strong>
+  <p>An autonomous trading agent trained with Deep Reinforcement Learning (MaskablePPO) to dynamically hedge NIFTY50 weekly straddles on 1-minute intraday data, outperforming traditional Black-Scholes hedging by adapting to real-world transaction costs and margin constraints.</p>
+</div>
 
 <!-- ============ OVERVIEW ============ -->
 <section class="section" id="overview">
@@ -87,9 +65,15 @@
     <h2>The problem</h2>
   </div>
   <div class="prose reveal">
-    <p>Standard options hedging leans on Black-Scholes: continuous trading, constant volatility, no transaction costs, no discrete strikes. Real NSE intraday markets break every one of those assumptions — spreads widen, volatility clusters and jumps, and every rebalance costs money. A fixed delta-hedging rule doesn't adapt to any of that.</p>
-    <p>This project reframes hedging as a <strong>sequential decision problem</strong> instead of a formula. An agent observes the market and its own position, and at every one-minute step chooses whether to enter, add to, reduce, or exit a short/long straddle — learning the policy from experience rather than from a closed-form model. The scope is deliberately narrow and realistic: <strong>weekly at-the-money NIFTY50 straddles and strangles</strong>, trained and evaluated on real 1-minute NSE spot and India VIX data, with transaction costs, slippage, and a dynamic exchange-style margin model all simulated in the loop.</p>
-    <p>Three algorithms were trained and compared — <strong>PPO</strong> and <strong>A2C</strong> as baselines, and <strong>Maskable PPO</strong> as the primary agent, which is the version this write-up focuses on. The work is published as <em>“Direct Reinforcement for Derivatives: Enhancing Intraday Deep Hedging via Risk-Averse Reward Shaping”</em> (GCon 2026).</p>
+    <p>Standard options hedging leans heavily on Black-Scholes assumptions: continuous trading, constant volatility, and no transaction costs.</p>
+    <p>Real NSE intraday markets break every one of those rules. Spreads widen, volatility clusters, and every rebalance eats into your profit margins. A fixed delta-hedging formula simply doesn't adapt to that reality.</p>
+    <p>This project reframes hedging entirely as a <strong>sequential decision problem</strong>.</p>
+    <p>An autonomous agent observes the live market and its current position. At every one-minute step, it chooses whether to enter, add to, reduce, or exit a short/long straddle.</p>
+    <p>Instead of following a closed-form mathematical model, it learns its policy purely from experience.</p>
+    <p>The scope is deliberately narrow and realistic: <strong>weekly at-the-money NIFTY50 straddles and strangles</strong>.</p>
+    <p>It's trained and evaluated on real 1-minute NSE spot and India VIX data. Transaction costs, slippage, and a dynamic exchange-style margin model are all simulated directly in the loop.</p>
+    <p>Three algorithms were trained and compared — <strong>PPO</strong> and <strong>A2C</strong> as baselines, and <strong>Maskable PPO</strong> as the primary agent (which is the version this write-up focuses on).</p>
+    <p>The work is published as <em>“Direct Reinforcement for Derivatives: Enhancing Intraday Deep Hedging via Risk-Averse Reward Shaping”</em> (GCon 2026).</p>
   </div>
 </section>
 
@@ -101,38 +85,15 @@
     <p class="section-sub">A Gymnasium environment simulating the NIFTY50 options market, wrapped by a masked actor-critic policy trained with Stable-Baselines3 / sb3-contrib.</p>
   </div>
 
-  <div class="diagram-card reveal">
-    <span class="diagram-label">Data → decision → execution loop</span>
-    <div class="pipeline">
-      <div class="pipeline-box on"><span class="t">Market Data</span><span class="d">NIFTY50 1-min OHLC<br>+ India VIX</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box"><span class="t">Feature Engine</span><span class="d">Black-Scholes Greeks<br>+ vol estimators</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box"><span class="t">State (69-d)</span><span class="d">Gymnasium<br>Box observation</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box on"><span class="t">MaskablePPO</span><span class="d">Actor-critic policy<br>+ action mask</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box"><span class="t">Action</span><span class="d">1 of 8 discrete<br>position moves</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box"><span class="t">Execution</span><span class="d">Fill, SPAN-like<br>margin, txn cost</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box on"><span class="t">Reward</span><span class="d">Multi-horizon PnL<br>− drawdown penalty</span></div>
-    </div>
-
-    <div class="branch-grid">
-      <div class="branch-card">
-        <div class="bc-head">↺ training loop</div>
-        <p>Reward flows into a rollout buffer; every 1,024 steps × 4 parallel envs, PPO's clipped surrogate objective updates the policy and value networks, and the loop continues into the next minute of the episode.</p>
-      </div>
-      <div class="branch-card">
-        <div class="bc-head">⛒ action masking</div>
-        <p>Before the policy samples an action, the environment computes a live boolean mask from current position, lot limits, and available margin — e.g. <code>ENTER_LONG</code> is masked out unless margin ≤ available cash. Invalid actions never enter the loss.</p>
-      </div>
-      <div class="branch-card">
-        <div class="bc-head">📐 margin model</div>
-        <p>Short legs are margined with a dynamic SPAN-like calculator: a 3.5σ price scan at +25% stressed IV plus a 3% notional exposure add-on, recomputed every step as spot and IV move.</p>
-      </div>
-    </div>
+  <div class="mermaid">
+  flowchart LR
+      MD[Market Data<br/>NIFTY50 1-min] --> FE[Feature Engine<br/>Greeks & Vol]
+      FE --> S[State<br/>69-d Box]
+      S --> P(MaskablePPO<br/>Policy & Masking)
+      P --> A[Action<br/>1 of 8 Moves]
+      A --> E[Execution<br/>Margin & Cost]
+      E --> R[Reward<br/>PnL - Penalty]
+      R -.->|Training Loop| P
   </div>
 
   <div class="mt-lg reveal">
@@ -363,8 +324,8 @@ explainability_dashboard.py              <span class="tok-com"># Plotly HTML SHA
   </div>
 
   <div class="split-grid reveal">
-    <div class="split-col">
-      <h4>— Limitations</h4>
+    <div class="split-col prose">
+      <h3>Limitations</h3>
       <ul>
         <li><strong>Static cost model.</strong> Transaction cost and slippage are applied as a flat 0.5% rather than an order-book-aware, liquidity-dependent estimate.</li>
         <li><strong>Discrete strike grid.</strong> The agent trades ATM ± a fixed offset; it doesn't choose strikes continuously or react to skew shape directly.</li>
@@ -373,8 +334,8 @@ explainability_dashboard.py              <span class="tok-com"># Plotly HTML SHA
         <li><strong>Backtest–live gap.</strong> Strong out-of-sample numbers on historical data are necessary but not sufficient evidence for live performance.</li>
       </ul>
     </div>
-    <div class="split-col">
-      <h4>— Future work</h4>
+    <div class="split-col prose">
+      <h3>Future Work</h3>
       <ul>
         <li><strong>Continuous control (SAC / TD3)</strong> to size positions and choose strikes/offsets continuously instead of from a fixed discrete menu.</li>
         <li><strong>Order-book features</strong> — bid-ask depth and imbalance — to move the cost model from static to microstructure-aware.</li>
@@ -414,16 +375,15 @@ explainability_dashboard.py              <span class="tok-com"># Plotly HTML SHA
 
 <!-- ============ FOOTER NAV ============ -->
 <div class="case-footer-nav reveal">
-  <a href="index.html">
-    <span class="cf-lbl">← Back to</span>
-    <span class="cf-to">All Projects</span>
+  <a href="../index.html">
+    <span class="cf-to">← All Projects</span>
   </a>
   <a class="cf-next" href="vocalsql.html">
-    <span class="cf-lbl">Next case study →</span>
-    <span class="cf-to">VocalSQL</span>
+    <span class="cf-to">VocalSQL →</span>
   </a>
 </div>
 
+</div>
 </main>
 
 <footer class="footer">
@@ -432,6 +392,6 @@ explainability_dashboard.py              <span class="tok-com"># Plotly HTML SHA
   <a href="#top">Back to top ↑</a>
 </footer>
 
-<script src="../assets/js/site.js" defer></script>
+
 </body>
 </html>

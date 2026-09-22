@@ -9,40 +9,41 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%237c3aed'/%3E%3Ctext x='50' y='68' font-family='monospace' font-size='52' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/site.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Neucha&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
 </head>
-<body>
+<body class="sticky-page">
 
 <a href="#top" class="skip-link">Skip to content</a>
 <div class="scroll-progress" id="scroll-progress"></div>
 
-<header class="nav" id="nav">
-  <a href="../index.html" class="nav-mark">kp<span>/</span></a>
-  <nav class="nav-links" id="nav-links">
-    <a href="../index.html#about">About</a>
-    <a href="../index.html#skills">Skills</a>
-    <a href="../index.html#experience">Experience</a>
-    <a href="index.html">Projects</a>
-    <a href="../index.html#contact">Contact</a>
-  </nav>
-  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
-    <span></span><span></span><span></span>
-  </button>
-</header>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="../index.html" aria-label="Home">Keyurkumar Panchal</a>
+    <button class="nav-toggle" onclick="toggleNav()" aria-label="Open menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#skills">Skills</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="index.html">Projects</a>
+      <a href="../index.html#contact">Contact</a>
+      <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">☾</button>
+    </div>
+  </div>
+</nav>
 
 <main id="top">
+<div class="paper-wrapper">
 
-<p class="crumb">
-  <a href="../index.html">kp/</a><span class="sep">/</span>
-  <a href="index.html">projects</a><span class="sep">/</span>
-  <span class="current">TaskIQ</span>
-</p>
 
 <!-- ============ HERO ============ -->
-<section class="case-hero">
+<section class="detail-header">
   <p class="case-eyebrow">~/projects/TaskIQ · README.md</p>
-  <h1 class="case-title">TaskIQ — AI Project Manager</h1>
+  <h1>TaskIQ — AI Project Manager</h1>
   <p class="case-thesis">Turns unstructured meeting notes and chat logs into structured, prioritized tasks — a chain-of-thought Gemini pipeline with schema-constrained JSON extraction, a persistence layer, and a live drag-and-drop Kanban board on top.</p>
 
   <div class="case-links">
@@ -50,36 +51,12 @@
     <a class="btn btn-ghost" href="https://taskiq-9j8s.onrender.com" target="_blank" rel="noopener noreferrer">Live Demo</a>
     <a class="btn btn-ghost" href="#example">Jump to Worked Example</a>
   </div>
-
-  <div class="stat-grid reveal">
-    <div class="stat-cell">
-      <span class="num">6</span>
-      <span class="lbl">REST API Endpoints</span>
-    </div>
-    <div class="stat-cell">
-      <span class="num">3×</span>
-      <span class="lbl">Exponential Backoff Retries</span>
-    </div>
-    <div class="stat-cell">
-      <span class="num">5</span>
-      <span class="lbl">pytest Test Functions</span>
-    </div>
-    <div class="stat-cell">
-      <span class="num">200w</span>
-      <span class="lbl">Max AI Summary Length</span>
-    </div>
-  </div>
 </section>
 
-<nav class="case-toc" aria-label="Section contents">
-  <span class="lbl">Contents</span>
-  <a href="#overview">Overview</a>
-  <a href="#architecture">Architecture</a>
-  <a href="#methodology">How It Works</a>
-  <a href="#example">Worked Example</a>
-  <a href="#results">Kanban &amp; Reliability</a>
-  <a href="#stack">Tech Stack</a>
-</nav>
+<div class="tldr-box reveal" style="margin-top: 40px;">
+  <strong>TL;DR</strong>
+  <p>An AI project management tool that takes unstructured meeting notes and uses a chain-of-thought Gemini pipeline to extract structured, actionable tickets straight onto a live Kanban board, complete with strict JSON schema enforcement and automatic retries.</p>
+</div>
 
 <!-- ============ OVERVIEW ============ -->
 <section class="section" id="overview">
@@ -88,8 +65,11 @@
     <h2>The problem</h2>
   </div>
   <div class="prose reveal">
-    <p>Meeting notes and chat logs are full of tasks that never make it onto anyone's board — buried in a sentence, missing an owner, with a deadline stated as "by EOD" instead of a date. Someone has to read the whole thing and manually translate it into tickets. TaskIQ does that translation step: paste in raw, messy text and get back structured tasks — description, owner, due date, priority — ready to drop onto a Kanban board.</p>
-    <p>The core design problem is <strong>reliability of extraction</strong>. A plain "summarize this into tasks" prompt tends to invent fields, skip implicit deadlines, or return inconsistent JSON shapes between calls. TaskIQ constrains the model with a <strong>Pydantic response schema</strong> and forces it to reason before it extracts, rather than trusting free-form output.</p>
+    <p>Meeting notes and chat logs are full of tasks that never make it onto anyone's board.</p>
+    <p>They get buried in a sentence, miss an owner, or have a deadline stated vaguely as "by EOD". Someone always has to read the whole thing and manually translate it into tickets.</p>
+    <p>TaskIQ completely automates that translation step. You paste in raw, messy text, and get back structured tasks (description, owner, due date, priority) ready to drop onto a Kanban board.</p>
+    <p>The core design problem is <strong>reliability of extraction</strong>. A plain "summarize this into tasks" prompt tends to invent fields, skip implicit deadlines, or return inconsistent JSON shapes.</p>
+    <p>To solve this, TaskIQ constrains the model with a <strong>Pydantic response schema</strong> and forces it to explicitly write out its reasoning before it extracts any data.</p>
   </div>
 </section>
 
@@ -101,36 +81,13 @@
     <p class="section-sub">A vanilla JS/HTML/CSS frontend talking to a small FastAPI service, backed by SQLite and Google's Gemini API.</p>
   </div>
 
-  <div class="diagram-card reveal">
-    <span class="diagram-label">Extraction flow</span>
-    <div class="pipeline">
-      <div class="pipeline-box on"><span class="t">Raw Notes</span><span class="d">Pasted meeting text<br>or chat log</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box"><span class="t">POST /api/tasks/extract</span><span class="d">FastAPI route</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box on"><span class="t">Gemini 2.5 Flash</span><span class="d">CoT reasoning +<br>schema-locked JSON</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box"><span class="t">Parsed Tasks</span><span class="d">description, owner,<br>due date, priority</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box"><span class="t">SQLite</span><span class="d">tasks.db</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box on"><span class="t">Kanban UI</span><span class="d">Drag-and-drop<br>status columns</span></div>
-    </div>
-
-    <div class="branch-grid">
-      <div class="branch-card">
-        <div class="bc-head">🧠 chain-of-thought first</div>
-        <p>The schema's first field is <code>reasoning</code>, not the task itself — the model has to write out its inference about priority and ownership before it's allowed to produce the structured fields.</p>
-      </div>
-      <div class="branch-card">
-        <div class="bc-head">↺ resilient by default</div>
-        <p>Every LLM call is wrapped in Tenacity's <code>retry</code> with exponential backoff (up to 3 attempts), so a transient API hiccup doesn't surface as a failed extraction.</p>
-      </div>
-      <div class="branch-card">
-        <div class="bc-head">📝 executive summary</div>
-        <p>A second, independent flow reads every task row back out of SQLite and asks Gemini for a stakeholder-ready status summary — on-track / at-risk / behind, highlights, blockers, next steps.</p>
-      </div>
-    </div>
+  <div class="mermaid">
+  flowchart LR
+      RN[Raw Notes<br/>Chat Log] --> FA[FastAPI<br/>/api/tasks/extract]
+      FA --> GF(Gemini 2.5 Flash<br/>CoT + Schema)
+      GF --> PT[Parsed Tasks<br/>JSON Fields]
+      PT --> DB[(SQLite<br/>tasks.db)]
+      DB --> UI[Kanban UI<br/>Drag & Drop]
   </div>
 </section>
 
@@ -225,8 +182,8 @@
   </div>
 
   <div class="split-grid reveal">
-    <div class="split-col">
-      <h4>— Kanban board</h4>
+    <div class="split-col prose">
+      <h3>Kanban Board</h3>
       <ul>
         <li><strong>Native HTML5 drag-and-drop</strong> across To&nbsp;Do / In&nbsp;Progress / Done columns — dragging a card fires a <code>PUT /api/tasks/{task_id}</code> to persist the new status immediately.</li>
         <li><strong>CSV export</strong> of the current task list for sharing outside the app.</li>
@@ -234,8 +191,8 @@
         <li><strong>One-click AI summary</strong> panel that calls <code>/api/tasks/summary</code> and renders the markdown report inline.</li>
       </ul>
     </div>
-    <div class="split-col">
-      <h4>— Test suite</h4>
+    <div class="split-col prose">
+      <h3>Test Suite</h3>
       <ul>
         <li><strong>Isolated per-test database</strong> — a fixture creates a fresh SQLite file before each test and deletes it after, so tests never share state.</li>
         <li><strong>Full CRUD coverage</strong> — create, list, update, and delete are each exercised through FastAPI's <code>TestClient</code> against real HTTP routes.</li>
@@ -282,16 +239,15 @@
 
 <!-- ============ FOOTER NAV ============ -->
 <div class="case-footer-nav reveal">
-  <a href="vocalsql.html">
-    <span class="cf-lbl">← Previous case study</span>
-    <span class="cf-to">VocalSQL</span>
+  <a href="../index.html">
+    <span class="cf-to">← All Projects</span>
   </a>
   <a class="cf-next" href="rl-directional-straddle.html">
-    <span class="cf-lbl">Back to the first →</span>
-    <span class="cf-to">RL Directional Straddle</span>
+    <span class="cf-to">RL Straddle →</span>
   </a>
 </div>
 
+</div>
 </main>
 
 <footer class="footer">
@@ -300,6 +256,6 @@
   <a href="#top">Back to top ↑</a>
 </footer>
 
-<script src="../assets/js/site.js" defer></script>
+
 </body>
 </html>

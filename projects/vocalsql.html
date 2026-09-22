@@ -9,40 +9,41 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%237c3aed'/%3E%3Ctext x='50' y='68' font-family='monospace' font-size='52' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/site.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Neucha&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<script src="../theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
 </head>
-<body>
+<body class="sticky-page">
 
 <a href="#top" class="skip-link">Skip to content</a>
 <div class="scroll-progress" id="scroll-progress"></div>
 
-<header class="nav" id="nav">
-  <a href="../index.html" class="nav-mark">kp<span>/</span></a>
-  <nav class="nav-links" id="nav-links">
-    <a href="../index.html#about">About</a>
-    <a href="../index.html#skills">Skills</a>
-    <a href="../index.html#experience">Experience</a>
-    <a href="index.html">Projects</a>
-    <a href="../index.html#contact">Contact</a>
-  </nav>
-  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
-    <span></span><span></span><span></span>
-  </button>
-</header>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="../index.html" aria-label="Home">Keyurkumar Panchal</a>
+    <button class="nav-toggle" onclick="toggleNav()" aria-label="Open menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <a href="../index.html#about">About</a>
+      <a href="../index.html#skills">Skills</a>
+      <a href="../index.html#experience">Experience</a>
+      <a href="index.html">Projects</a>
+      <a href="../index.html#contact">Contact</a>
+      <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">☾</button>
+    </div>
+  </div>
+</nav>
 
 <main id="top">
+<div class="paper-wrapper">
 
-<p class="crumb">
-  <a href="../index.html">kp/</a><span class="sep">/</span>
-  <a href="index.html">projects</a><span class="sep">/</span>
-  <span class="current">VocalSQL</span>
-</p>
 
 <!-- ============ HERO ============ -->
-<section class="case-hero">
+<section class="detail-header">
   <p class="case-eyebrow">~/projects/VocalSQL · README.md</p>
-  <h1 class="case-title">VocalSQL — Natural Language to SQL</h1>
+  <h1>VocalSQL — Natural Language to SQL</h1>
   <p class="case-thesis">A self-correcting 7-node LangGraph agent that turns plain-English questions into safe, validated SQL — grounded by RAG schema retrieval, scored for confidence before it runs anything, and backed by a 9-layer defense against hallucinated tables, columns, and queries.</p>
 
   <div class="case-links">
@@ -50,36 +51,14 @@
     <a class="btn btn-ghost" href="https://vocalsql.onrender.com/" target="_blank" rel="noopener noreferrer">Live Demo</a>
     <a class="btn btn-ghost" href="#example">Jump to Worked Example</a>
   </div>
-
-  <div class="stat-grid reveal">
-    <div class="stat-cell">
-      <span class="num">7</span>
-      <span class="lbl">LangGraph Pipeline Nodes</span>
-    </div>
-    <div class="stat-cell">
-      <span class="num">9</span>
-      <span class="lbl">Anti-Hallucination Layers</span>
-    </div>
-    <div class="stat-cell">
-      <span class="num">≤ 3</span>
-      <span class="lbl">Self-Correction Retries</span>
-    </div>
-    <div class="stat-cell">
-      <span class="num">3</span>
-      <span class="lbl">DB Engines Supported</span>
-    </div>
-  </div>
 </section>
 
-<nav class="case-toc" aria-label="Section contents">
-  <span class="lbl">Contents</span>
-  <a href="#overview">Overview</a>
-  <a href="#architecture">Architecture</a>
-  <a href="#methodology">How It Works</a>
-  <a href="#results">Guardrails</a>
-  <a href="#example">Worked Example</a>
-  <a href="#stack">Tech Stack</a>
-</nav>
+<div class="tldr-box reveal" style="margin-top: 40px;">
+  <strong>TL;DR</strong>
+  <p>A self-correcting AI agent that safely turns plain English into SQL queries. Built on LangGraph, it uses schema RAG to ground the AI, runs syntax checks before execution, and automatically repairs broken queries without crashing.</p>
+</div>
+
+
 
 <!-- ============ OVERVIEW ============ -->
 <section class="section" id="overview">
@@ -88,9 +67,13 @@
     <h2>The problem</h2>
   </div>
   <div class="prose reveal">
-    <p>Asking an LLM to turn a question straight into SQL is easy to demo and risky to ship. A single generation call has no way to check itself — it can reference a column that doesn't exist, silently misjoin two tables, or return a confident, wrong answer with no signal that anything went wrong. For a tool meant to sit in front of a real database, "usually right" isn't good enough.</p>
-    <p>VocalSQL treats text-to-SQL as a <strong>pipeline problem, not a single-call problem</strong>: retrieve the real schema before generating anything, score the model's own confidence before running the query, validate syntax and schema-compliance before execution, and give the model a chance to fix its own mistakes — with a bounded number of retries — before ever falling back to silence rather than a wrong answer.</p>
-    <p>The demo ships with a self-contained <strong>15-table e-commerce schema</strong> (customers, orders, products, inventory, payments, and more) seeded with 2,000+ records, and the same pipeline connects to SQLite, PostgreSQL, or MySQL databases registered at runtime.</p>
+    <p>Asking an LLM to turn a question straight into SQL is easy to demo, but risky to ship.</p>
+    <p>A single generation call has no way to check itself. It can reference a column that doesn't exist, silently misjoin two tables, or return a confident, wrong answer with no signal that anything went wrong.</p>
+    <p>For a tool meant to sit in front of a real database, "usually right" isn't good enough.</p>
+    <p>VocalSQL treats text-to-SQL as a <strong>pipeline problem, not a single-call problem</strong>.</p>
+    <p>It retrieves the real schema before generating anything. It scores the model's own confidence before running the query.</p>
+    <p>It validates syntax and schema-compliance before execution, and gives the model a chance to fix its own mistakes — with a bounded number of retries — before ever falling back to silence rather than a wrong answer.</p>
+    <p>The demo ships with a self-contained <strong>15-table e-commerce schema</strong> seeded with 2,000+ records, and the same pipeline connects to SQLite, PostgreSQL, or MySQL databases registered at runtime.</p>
   </div>
 </section>
 
@@ -102,40 +85,19 @@
     <p class="section-sub">A LangGraph state machine — nine nodes, three conditional gates — served behind a FastAPI backend.</p>
   </div>
 
-  <div class="diagram-card reveal">
-    <span class="diagram-label">Question → grounded SQL → validated answer</span>
-    <div class="pipeline">
-      <div class="pipeline-box on"><span class="t">Router</span><span class="d">Intent + safety<br>keyword gate</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box"><span class="t">Schema RAG</span><span class="d">Top-5 tables<br>ChromaDB</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box"><span class="t">Few-Shot RAG</span><span class="d">Top-3 similar<br>Q→SQL pairs</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box on"><span class="t">SQL Generator</span><span class="d">Llama 3.3 70B<br>temp = 0.0</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box"><span class="t">Confidence</span><span class="d">4-signal fusion<br>0–100 score</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box on"><span class="t">Validator</span><span class="d">Syntax + schema<br>+ safety checks</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box"><span class="t">Executor</span><span class="d">10s timeout<br>guard</span></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-box on"><span class="t">Formatter</span><span class="d">NL answer +<br>data table</span></div>
-    </div>
-
-    <div class="branch-grid">
-      <div class="branch-card">
-        <div class="bc-head">⛒ safety short-circuit</div>
-        <p>The router blocks data-modification intent (DROP / DELETE / UPDATE / INSERT) with zero-cost keyword matching before any LLM call is made, and routes genuinely unclear questions straight to a clarification response.</p>
-      </div>
-      <div class="branch-card">
-        <div class="bc-head">◇ confidence gate</div>
-        <p>If the fused confidence score signals real ambiguity, the graph skips validation entirely and asks the user a clarifying question instead of guessing at intent.</p>
-      </div>
-      <div class="branch-card">
-        <div class="bc-head">↺ self-correction loop</div>
-        <p>An invalid or failed query routes to the corrector, which feeds the exact error back to the LLM and returns to the validator — up to 3 times — before the pipeline gives up gracefully.</p>
-      </div>
-    </div>
+  <div class="mermaid">
+  flowchart LR
+      Q[User Question] --> R{Router}
+      R -->|Valid| SR[Schema RAG<br/>ChromaDB]
+      R -->|Invalid| B[Block]
+      SR --> FR[Few-Shot RAG]
+      FR --> G(SQL Generator<br/>Llama 3.3 70B)
+      G --> C{Confidence Gate}
+      C -->|High| V[Validator]
+      C -->|Low| U[Ask User]
+      V -->|Valid| E[Executor]
+      V -.->|Error Loop| G
+      E --> F[Formatter<br/>NL Answer]
   </div>
 
   <div class="mt-lg reveal">
@@ -329,16 +291,15 @@
 
 <!-- ============ FOOTER NAV ============ -->
 <div class="case-footer-nav reveal">
-  <a href="rl-directional-straddle.html">
-    <span class="cf-lbl">← Previous case study</span>
-    <span class="cf-to">RL Directional Straddle</span>
+  <a href="../index.html">
+    <span class="cf-to">← All Projects</span>
   </a>
   <a class="cf-next" href="taskiq.html">
-    <span class="cf-lbl">Next case study →</span>
-    <span class="cf-to">TaskIQ</span>
+    <span class="cf-to">TaskIQ →</span>
   </a>
 </div>
 
+</div>
 </main>
 
 <footer class="footer">
@@ -347,6 +308,6 @@
   <a href="#top">Back to top ↑</a>
 </footer>
 
-<script src="../assets/js/site.js" defer></script>
+
 </body>
 </html>

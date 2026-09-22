@@ -1,379 +1,266 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Keyurkumar Panchal — AI Engineer</title>
-<meta name="description" content="Portfolio of Keyurkumar Panchal — AI Engineer specializing in deep reinforcement learning, computer vision, and production backend systems.">
-<meta name="theme-color" content="#fbfafc">
-<meta property="og:title" content="Keyurkumar Panchal — AI Engineer">
-<meta property="og:description" content="Deep reinforcement learning, computer vision, and production backend systems.">
-<meta property="og:type" content="website">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%237c3aed'/%3E%3Ctext x='50' y='68' font-family='monospace' font-size='52' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&amp;family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/site.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Keyurkumar Panchal — AI Engineer</title>
+  <meta name="description" content="Portfolio of Keyurkumar Panchal — AI Engineer specializing in deep reinforcement learning, computer vision, and production backend systems." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Neucha&family=Kalam:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="theme.js"></script>
 </head>
-<body>
+<body class="sticky-page">
 
-<a href="#top" class="skip-link">Skip to content</a>
-<div class="scroll-progress" id="scroll-progress"></div>
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html" aria-label="Home">
+      Keyurkumar Panchal
+    </a>
+    <button class="nav-toggle" onclick="toggleNav()" aria-label="Open menu"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <a href="#about" onclick="toggleNav()">About</a>
+      <a href="#experience" onclick="toggleNav()">Experience</a>
+      <a href="#education" onclick="toggleNav()">Education</a>
+      <a href="#projects" onclick="toggleNav()">Projects</a>
+      <a href="#skills" onclick="toggleNav()">Skills</a>
+      <a href="#contact" onclick="toggleNav()">Contact</a>
+      <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">☾</button>
+    </div>
+  </div>
+</nav>
 
-<header class="nav" id="nav">
-  <a href="#top" class="nav-mark">kp<span>/</span></a>
-  <nav class="nav-links" id="nav-links">
-    <a href="#about">About</a>
-    <a href="#skills">Skills</a>
-    <a href="#experience">Experience</a>
-    <a href="projects/index.html">Projects</a>
-    <a href="#education">Education</a>
-    <a href="#contact">Contact</a>
-  </nav>
-  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
-    <span></span><span></span><span></span>
-  </button>
+<header class="hero">
+  <div class="container hero-grid">
+    <div>
+      <h1>Keyurkumar Panchal</h1>
+      <p class="tagline">AI Engineer — <span id="typewriter-text" data-words='["Reinforcement Learning", "Computer Vision", "Deep Learning", "LLMs & Agents"]'>Reinforcement Learning</span><span class="typewriter-cursor"></span></p>
+      <p class="sub">I'm an AI Engineer focused on Reinforcement Learning, Computer Vision, and LLM-powered agents. I enjoy working at the edge of research and engineering — building systems that learn from messy, real-world data and turning them into something that actually runs in production.</p>
+      <p class="sub">I've shipped Python backends, ERP modules, and full-stack web apps, and I'm always looking for harder problems to solve.</p>
+      <a class="btn" href="#contact">Get in touch</a>
+    </div>
+    <div>
+      <div class="hero-art">
+        <img src="https://github.com/Keyur53987.png?size=400" alt="Keyurkumar Panchal" />
+      </div>
+      <div class="sticky-note">P.S. thanks for stopping by — let's build something great! 👋</div>
+    </div>
+  </div>
 </header>
 
-<main id="top">
+<div class="metrics">
+  <div class="container">
+    <h2 class="metrics-title">Impact in Numbers</h2>
+  </div>
+  <div class="container metrics-grid">
+    <div class="metric"><b>01</b><span>Published Paper</span></div>
+    <div class="metric"><b>04</b><span>Focus — RL, CV, DL, LLM</span></div>
+    <div class="metric"><b>02</b><span>Live Deployed Apps</span></div>
+  </div>
+</div>
 
-  <!-- ============ HERO ============ -->
-  <section class="hero">
-    <p class="hero-role">AI Engineer — <span id="role-rotator">Reinforcement Learning</span></p>
-    <h1 class="hero-title">Keyurkumar<br><em>Panchal</em></h1>
-    <p class="hero-location">Ahmedabad, Gujarat, India</p>
+<section id="experience">
+  <div class="container">
+    <h2>Experience</h2>
 
-    <div class="hero-cta">
-      <a href="#projects" class="btn btn-primary">View Projects</a>
-      <a href="#contact" class="btn btn-ghost">Get in Touch</a>
-      <a href="Keyur_resume.pdf" class="btn btn-ghost" download="Keyurkumar_Panchal_Resume.pdf">Download Résumé</a>
-    </div>
-  </section>
-
-  <!-- ============ ABOUT ============ -->
-  <section class="section" id="about">
-    <div class="section-head reveal">
-      <p class="section-path">~/about</p>
-      <h2>About</h2>
-    </div>
-    <div class="about-grid reveal">
-      <p class="about-lead">
-        <strong>AI Engineer</strong> focused on <strong>Reinforcement Learning</strong>, <strong>Computer Vision</strong>, and <strong>LLM-powered agents</strong>. I enjoy working at the edge of research and engineering — building systems that learn from messy, real-world data and turning them into something that actually runs in production. I've shipped Python backends, ERP modules, and full-stack web apps, and I'm always looking for harder problems to solve.
-      </p>
-      <div class="about-stats">
-        <div>
-          <span class="stat-num">01</span>
-          <span class="stat-label">Published Research Paper</span>
-        </div>
-        <div>
-          <span class="stat-num">04</span>
-          <span class="stat-label">Focus — RL · CV · DL · LLM</span>
-        </div>
-        <div>
-          <span class="stat-num">02</span>
-          <span class="stat-label">Live Deployed Apps</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SKILLS ============ -->
-  <section class="section" id="skills">
-    <div class="section-head reveal">
-      <p class="section-path">~/skills</p>
-      <h2>Skills</h2>
-    </div>
-    <div class="skills-groups reveal">
-
-      <!-- ── Computer Vision ── -->
+    <div class="exp-item">
+      <div class="exp-date">Apr 2024 — Jul 2024</div>
       <div>
-        <span class="skills-cat">Computer Vision</span>
-        <div class="chip-row">
-          <span class="chip">OpenCV</span>
-          <span class="chip">Ultralytics YOLO Models</span>
-          <span class="chip">DeepSort</span>
-          <span class="chip">MediaPipe</span>
-          <span class="chip">Image Segmentation</span>
-          <span class="chip">Object Tracking</span>
-          <span class="chip">Optical Flow</span>
-          <span class="chip">Pose Estimation</span>
-          <span class="chip">Video Analytics</span>
-        </div>
+        <h3>Python Developer</h3>
+        <div class="org">Warlock Technologies, Gandhinagar</div>
+        <p>Designed and developed custom Odoo modules tailored to client needs, enhancing ERP capabilities. Integrated third-party applications and ERP systems to improve workflow automation and data consistency.</p>
       </div>
-
-      <!-- ── Deep Learning ── -->
-      <div>
-        <span class="skills-cat">Deep Learning</span>
-        <div class="chip-row">
-          <span class="chip">PyTorch</span>
-          <span class="chip">TensorFlow</span>
-          <span class="chip">Keras</span>
-          <span class="chip">ONNX</span>
-          <span class="chip">CNNs</span>
-          <span class="chip">RNNs / LSTMs</span>
-          <span class="chip">Transformers</span>
-          <span class="chip">GANs</span>
-          <span class="chip">Autoencoders</span>
-          <span class="chip">Transfer Learning</span>
-          <span class="chip">Model Quantization</span>
-          <span class="chip">TensorRT</span>
-        </div>
-      </div>
-
-      <!-- ── Machine Learning ── -->
-      <div>
-        <span class="skills-cat">Machine Learning</span>
-        <div class="chip-row">
-          <span class="chip">Scikit-learn</span>
-          <span class="chip">XGBoost</span>
-          <span class="chip">LightGBM</span>
-          <span class="chip">Pandas</span>
-          <span class="chip">NumPy</span>
-          <span class="chip">Matplotlib / Seaborn</span>
-          <span class="chip">Feature Engineering</span>
-          <span class="chip">Hyperparameter Tuning</span>
-          <span class="chip">Data Preprocessing</span>
-        </div>
-      </div>
-
-      <!-- ── LLM, Agents & RAG ── -->
-      <div>
-        <span class="skills-cat">LLM, Agents &amp; RAG</span>
-        <div class="chip-row">
-          <span class="chip">LangChain</span>
-          <span class="chip">LangGraph</span>
-          <span class="chip">RAG Pipelines</span>
-          <span class="chip">Hugging Face Transformers</span>
-          <span class="chip">ChromaDB</span>
-          <span class="chip">FAISS</span>
-          <span class="chip">Prompt Engineering</span>
-          <span class="chip">Fine-Tuning (LoRA / QLoRA)</span>
-          <span class="chip">Embedding Models</span>
-          <span class="chip">n8n</span>
-          <span class="chip">CrewAI</span>
-        </div>
-      </div>
-
-      <!-- ── Reinforcement Learning ── -->
-      <div>
-        <span class="skills-cat">Reinforcement Learning</span>
-        <div class="chip-row">
-          <span class="chip">Stable-Baselines3</span>
-          <span class="chip">Gymnasium</span>
-          <span class="chip">Ray RLlib</span>
-          <span class="chip">OpenAI Gym</span>
-          <span class="chip">PettingZoo</span>
-          <span class="chip">TorchRL</span>
-          <span class="chip">TensorBoard</span>
-        </div>
-      </div>
-
-      <!-- ── Languages & Scripting ── -->
-      <div>
-        <span class="skills-cat">Languages &amp; Scripting</span>
-        <div class="chip-row">
-          <span class="chip">Python</span>
-          <span class="chip">SQL</span>
-          <span class="chip">HTML</span>
-          <span class="chip">CSS</span>
-          <span class="chip">XML</span>
-          <span class="chip">YAML</span>
-        </div>
-      </div>
-
-      <!-- ── Backend, Tools & MLOps ── -->
-      <div>
-        <span class="skills-cat">Backend, Tools &amp; MLOps</span>
-        <div class="chip-row">
-          <span class="chip">Django</span>
-          <span class="chip">Flask</span>
-          <span class="chip">FastAPI</span>
-          <span class="chip">Git</span>
-          <span class="chip">Docker</span>
-          <span class="chip">MLflow</span>
-          <span class="chip">Weights &amp; Biases</span>
-          <span class="chip">Power BI</span>
-          <span class="chip">Linux / SSH</span>
-          <span class="chip">PostgreSQL</span>
-          <span class="chip">REST APIs</span>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ============ EXPERIENCE ============ -->
-  <section class="section" id="experience">
-    <div class="section-head reveal">
-      <p class="section-path">~/experience</p>
-      <h2>Experience</h2>
-    </div>
-    <div class="timeline reveal">
-      <article class="timeline-item">
-        <div class="timeline-date">Apr 2024 — Jul 2024</div>
-        <div class="timeline-body">
-          <h3>Python Developer <span class="co">— Warlock Technologies</span></h3>
-          <p class="timeline-loc">Gandhinagar, Gujarat</p>
-          <ul>
-            <li>Designed and developed custom Odoo modules tailored to client needs, enhancing ERP capabilities.</li>
-            <li>Integrated third-party applications and ERP systems to improve workflow automation and data consistency.</li>
-            <li>Provided technical support, debugging, and performance optimization for deployed Odoo solutions.</li>
-            <li>Collaborated with cross-functional teams to translate requirements into scalable software solutions.</li>
-          </ul>
-        </div>
-      </article>
-      <article class="timeline-item">
-        <div class="timeline-date">Jan 2023 — Jun 2023</div>
-        <div class="timeline-body">
-          <h3>Python Developer Intern <span class="co">— Axisray Technologies</span></h3>
-          <p class="timeline-loc">Ahmedabad, Gujarat</p>
-          <ul>
-            <li>Built and maintained Django-based web applications, focused on back-end functionality and database management.</li>
-            <li>Developed RESTful APIs for data exchange between front-end interfaces and server-side logic.</li>
-            <li>Participated in code reviews and agile development cycles, strengthening teamwork and software quality.</li>
-            <li>Improved application performance by optimizing queries and refining application structure.</li>
-          </ul>
-        </div>
-      </article>
-      <article class="timeline-item">
-        <div class="timeline-date">Jun 2022 — Jul 2022</div>
-        <div class="timeline-body">
-          <h3>Data Science Intern <span class="co">— Vnurture Technologies</span></h3>
-          <ul>
-            <li>Analyzed datasets using Python to extract insights, visualized using Power BI.</li>
-            <li>Performed data cleaning, transformation, and modeling to derive business intelligence.</li>
-            <li>Completed a capstone project on Employee Salary Analysis, identifying trends and presenting results.</li>
-          </ul>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- ============ PROJECTS — CASE STUDIES ============ -->
-  <section class="section" id="projects">
-    <div class="section-head reveal">
-      <p class="section-path">~/projects</p>
-      <h2>Pinned Projects</h2>
-      <p class="section-sub">Three of the more involved systems I've built, each with its own deep dive — architecture, methodology, and real results.</p>
     </div>
 
-    <div class="case-grid reveal">
-      <a class="case-card" href="projects/rl-directional-straddle.html">
-        <span class="pin-badge" aria-label="Pinned project" title="Pinned project">
-          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="5"/><rect x="10.5" y="12" width="3" height="10" rx="1"/></svg>
-          Pinned
-        </span>
-        <span class="cc-tag">Deep RL · Quant Finance</span>
-        <h3>Autonomous Options Trading &amp; Hedging with Deep RL</h3>
+    <div class="exp-item">
+      <div class="exp-date">Jan 2023 — Jun 2023</div>
+      <div>
+        <h3>Python Developer Intern</h3>
+        <div class="org">Axisray Technologies, Ahmedabad</div>
+        <p>Built and maintained Django-based web applications. Developed RESTful APIs for data exchange between front-end interfaces and server-side logic. Improved application performance by optimizing queries.</p>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-date">Jun 2022 — Jul 2022</div>
+      <div>
+        <h3>Data Science Intern</h3>
+        <div class="org">Vnurture Technologies</div>
+        <p>Analyzed datasets using Python to extract insights, visualized using Power BI. Performed data cleaning, transformation, and modeling to derive business intelligence.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="publications" class="section-alt">
+  <div class="container">
+    <h2>Publications</h2>
+    
+    <div class="exp-item">
+      <div class="exp-date">Jan 2026</div>
+      <div>
+        <h3>Direct Reinforcement for Derivatives: Enhancing Intraday Deep Hedging via Risk-Averse Reward Shaping</h3>
+        <div class="org">GCon 2026 · IEEE Xplore</div>
+        <p>A novel approach replacing Black-Scholes hedging rules with a MaskablePPO agent trained on 1-minute market data. Formulates NIFTY50 options hedging as a sequential decision problem directly over a 69-feature state space.</p>
+        <a href="https://ieeexplore.ieee.org/abstract/document/11649431/" target="_blank" rel="noopener" class="btn ghost" style="margin-top: 12px; display: inline-block;">View on IEEE</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="education">
+  <div class="container">
+    <h2>Education</h2>
+    
+    <div class="exp-item">
+      <div class="exp-date">Jul 2024 — May 2026</div>
+      <div>
+        <h3>M.Tech in Artificial Intelligence — 8.50 CGPA</h3>
+        <div class="org">Pandit Dindayal Petroleum University, Gandhinagar</div>
+      </div>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-date">Aug 2019 — May 2023</div>
+      <div>
+        <h3>B.E. in Computer Engineering — 7.90 CGPA</h3>
+        <div class="org">Silver Oak College of Engineering and Technology, Ahmedabad</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="container">
+    <h2>Projects</h2>
+    <p class="sub" style="margin-top: -15px; margin-bottom: 35px; font-family: 'Kalam', cursive; font-size: 1.1rem; color: var(--text-muted);">These three are just the tip of the iceberg...</p>
+    <div class="card-grid">
+
+      <a class="card" href="projects/rl-directional-straddle.html">
+        <h3>Autonomous Options Trading</h3>
         <p>A MaskablePPO agent that trades and dynamically hedges NIFTY50 weekly straddles from a 69-feature option-Greeks state space — published at GCon 2026.</p>
-        <div class="cc-stats">
-          <div><span class="v">93.75%</span><span class="l">Win Rate</span></div>
-          <div><span class="v">47.66</span><span class="l">Profit Factor</span></div>
+        <div class="tags">
+          <span class="tag">Deep RL</span>
+          <span class="tag">Quant Finance</span>
         </div>
-        <span class="cc-read">README.md <span class="arrow">→</span></span>
+        <div class="card-links">
+          <span>README.md →</span>
+        </div>
       </a>
-      <a class="case-card" href="projects/vocalsql.html">
-        <span class="pin-badge" aria-label="Pinned project" title="Pinned project">
-          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="5"/><rect x="10.5" y="12" width="3" height="10" rx="1"/></svg>
-          Pinned
-        </span>
-        <span class="cc-tag">LangGraph · LLM Agents</span>
-        <h3>VocalSQL — Natural Language to SQL</h3>
+
+      <a class="card" href="projects/vocalsql.html">
+        <h3>VocalSQL</h3>
         <p>A self-correcting 7-node LangGraph agent that turns plain English into safe SQL, backed by RAG schema retrieval and a 9-layer anti-hallucination pipeline.</p>
-        <div class="cc-stats">
-          <div><span class="v">7</span><span class="l">Pipeline Nodes</span></div>
-          <div><span class="v">9</span><span class="l">Guardrail Layers</span></div>
+        <div class="tags">
+          <span class="tag">LangGraph</span>
+          <span class="tag">LLM Agents</span>
         </div>
-        <span class="cc-read">README.md <span class="arrow">→</span></span>
+        <div class="card-links">
+          <span>README.md →</span>
+        </div>
       </a>
-      <a class="case-card" href="projects/taskiq.html">
-        <span class="pin-badge" aria-label="Pinned project" title="Pinned project">
-          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="5"/><rect x="10.5" y="12" width="3" height="10" rx="1"/></svg>
-          Pinned
-        </span>
-        <span class="cc-tag">LLM · FastAPI</span>
+
+      <a class="card" href="projects/taskiq.html">
         <h3>TaskIQ — AI Project Manager</h3>
         <p>Converts unstructured meeting notes into structured, prioritized tasks with a chain-of-thought Gemini pipeline and a live drag-and-drop Kanban board.</p>
-        <div class="cc-stats">
-          <div><span class="v">6</span><span class="l">REST Endpoints</span></div>
-          <div><span class="v">3×</span><span class="l">Self-Retry Backoff</span></div>
+        <div class="tags">
+          <span class="tag">LLM</span>
+          <span class="tag">FastAPI</span>
         </div>
-        <span class="cc-read">README.md <span class="arrow">→</span></span>
+        <div class="card-links">
+          <span>README.md →</span>
+        </div>
       </a>
+
     </div>
 
-    <div class="view-all-row reveal">
-      <a class="btn btn-ghost" href="projects/index.html">View All Projects →</a>
+    <div style="text-align: center; margin-top: 50px;">
+      <a class="btn" href="projects/index.html" style="font-size: 1.2rem; padding: 12px 28px; background: var(--surface); border: 2px dashed var(--pencil); color: var(--text); display: inline-flex; align-items: center; gap: 8px;">View All Projects →</a>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ============ EDUCATION ============ -->
-  <section class="section" id="education">
-    <div class="section-head reveal">
-      <p class="section-path">~/education</p>
-      <h2>Education</h2>
-    </div>
-    <div class="timeline reveal">
-      <article class="timeline-item">
-        <div class="timeline-date">Jul 2024 — May 2026</div>
-        <div class="timeline-body">
-          <h3>M.Tech in Artificial Intelligence</h3>
-          <p class="timeline-loc">Pandit Dindayal Petroleum University, Gandhinagar, India</p>
-          <p class="edu-extra">CGPA: 8.50</p>
+<section id="skills" class="section-alt">
+  <div class="container">
+    <h2>Technical Skills</h2>
+    <div class="skills-grid">
+      
+      <div class="skill-group">
+        <h3>Computer Vision</h3>
+        <div class="tags">
+          <span class="tag">OpenCV</span><span class="tag">Ultralytics YOLO</span><span class="tag">DeepSort</span><span class="tag">MediaPipe</span><span class="tag">Segmentation</span><span class="tag">Tracking</span><span class="tag">Optical Flow</span><span class="tag">Pose Estimation</span><span class="tag">Video Analytics</span>
         </div>
-      </article>
-      <article class="timeline-item">
-        <div class="timeline-date">Aug 2019 — May 2023</div>
-        <div class="timeline-body">
-          <h3>B.E. in Computer Engineering</h3>
-          <p class="timeline-loc">Silver Oak College of Engineering and Technology, Ahmedabad, India</p>
-          <p class="edu-extra">CGPA: 7.90</p>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- ============ CONTACT ============ -->
-  <section class="section" id="contact">
-    <div class="section-head reveal">
-      <p class="section-path">~/contact</p>
-      <h2>Contact</h2>
-    </div>
-    <div class="contact-grid reveal">
-      <p class="contact-lead">Have a role, a research problem, or something worth building? I'd like to hear about it.</p>
-      <div class="contact-links">
-        <a href="mailto:keyurpanchal53987@gmail.com">
-          <span class="cl-label">Email</span>
-          <span class="cl-value">keyurpanchal53987@gmail.com</span>
-        </a>
-        <a href="tel:+919558926138">
-          <span class="cl-label">Phone</span>
-          <span class="cl-value">+91 95589 26138</span>
-        </a>
-        <a href="https://www.linkedin.com/in/keyurkumar-panchal-b355781a1/" target="_blank" rel="noopener noreferrer">
-          <span class="cl-label">LinkedIn</span>
-          <span class="cl-value">keyurkumar-panchal</span>
-        </a>
-        <a href="https://github.com/Keyur53987" target="_blank" rel="noopener noreferrer">
-          <span class="cl-label">GitHub</span>
-          <span class="cl-value">Keyur53987</span>
-        </a>
-        <a href="https://x.com/Keyur6333" target="_blank" rel="noopener noreferrer">
-          <span class="cl-label">X</span>
-          <span class="cl-value">Keyur6333</span>
-        </a>
       </div>
+
+      <div class="skill-group">
+        <h3>Deep Learning</h3>
+        <div class="tags">
+          <span class="tag">PyTorch</span><span class="tag">TensorFlow</span><span class="tag">Keras</span><span class="tag">ONNX</span><span class="tag">CNNs</span><span class="tag">RNNs/LSTMs</span><span class="tag">Transformers</span><span class="tag">GANs</span><span class="tag">Autoencoders</span><span class="tag">Transfer Learning</span><span class="tag">Quantization</span><span class="tag">TensorRT</span>
+        </div>
+      </div>
+
+      <div class="skill-group">
+        <h3>Machine Learning</h3>
+        <div class="tags">
+          <span class="tag">Scikit-learn</span><span class="tag">XGBoost</span><span class="tag">LightGBM</span><span class="tag">Pandas</span><span class="tag">NumPy</span><span class="tag">Matplotlib/Seaborn</span><span class="tag">Feature Engineering</span><span class="tag">Hyperparameter Tuning</span><span class="tag">Data Preprocessing</span>
+        </div>
+      </div>
+
+      <div class="skill-group">
+        <h3>LLM, Agents & RAG</h3>
+        <div class="tags">
+          <span class="tag">LangChain</span><span class="tag">LangGraph</span><span class="tag">RAG Pipelines</span><span class="tag">HF Transformers</span><span class="tag">ChromaDB</span><span class="tag">FAISS</span><span class="tag">Prompt Engineering</span><span class="tag">Fine-Tuning</span><span class="tag">Embedding Models</span><span class="tag">n8n</span><span class="tag">CrewAI</span>
+        </div>
+      </div>
+
+      <div class="skill-group">
+        <h3>Reinforcement Learning</h3>
+        <div class="tags">
+          <span class="tag">Stable-Baselines3</span><span class="tag">Gymnasium</span><span class="tag">Ray RLlib</span><span class="tag">OpenAI Gym</span><span class="tag">PettingZoo</span><span class="tag">TorchRL</span><span class="tag">TensorBoard</span>
+        </div>
+      </div>
+
+      <div class="skill-group">
+        <h3>Languages & Scripting</h3>
+        <div class="tags">
+          <span class="tag">Python</span><span class="tag">SQL</span><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">XML</span><span class="tag">YAML</span>
+        </div>
+      </div>
+
+      <div class="skill-group">
+        <h3>Backend, Tools & MLOps</h3>
+        <div class="tags">
+          <span class="tag">Django</span><span class="tag">Flask</span><span class="tag">FastAPI</span><span class="tag">Git</span><span class="tag">Docker</span><span class="tag">MLflow</span><span class="tag">Weights & Biases</span><span class="tag">Power BI</span><span class="tag">Linux/SSH</span><span class="tag">PostgreSQL</span><span class="tag">REST APIs</span>
+        </div>
+      </div>
+
     </div>
-  </section>
+  </div>
+</section>
 
-</main>
+<section id="contact" class="contact">
+  <div class="container">
+    <h2>Let's build something together.</h2>
+    <p>Have a role, a research problem, or something worth building? I'd like to hear about it.</p>
+    <a href="mailto:keyurpanchal53987@gmail.com" class="btn">Email Me</a>
+    <a href="https://github.com/Keyur53987" target="_blank" rel="noopener" class="btn ghost">GitHub</a>
+    <a href="https://www.linkedin.com/in/keyurkumar-panchal-b355781a1/" target="_blank" rel="noopener" class="btn ghost">LinkedIn</a>
+  </div>
+</section>
 
-<footer class="footer">
-  <span>© 2026 Keyurkumar Panchal</span>
-  <span>Ahmedabad, IN — 23.0225°N, 72.5714°E · <span id="local-time">--:--</span></span>
-  <a href="#top">Back to top ↑</a>
+<footer>
+  <div class="footer-inner">
+    <span>&copy; 2026 Keyurkumar Panchal</span>
+  </div>
 </footer>
 
-<script src="assets/js/site.js" defer></script>
+<script>
+  function toggleNav() {
+    const navLinks = document.getElementById('navLinks');
+    navLinks.classList.toggle('open');
+  }
+</script>
 </body>
 </html>
